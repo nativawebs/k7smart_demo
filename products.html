@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos - Kiosko7 Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+          <img src="https://negociolisto.online/wp-content/uploads/2025/11/logo_k7-3.svg" alt="Kiosko7">
+          <span class="sidebar-logo-text">Kiosko7</span>
+        </a>
+        <button class="sidebar-toggle" id="sidebar-toggle"><i class="bi bi-list"></i></button>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <h6 class="nav-section-title">Principal</h6>
+          <ul>
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="bi bi-speedometer2"></i><span class="nav-link-text">Dashboard</span></a></li>
+          </ul>
+        </div>
+        <div class="nav-section">
+          <h6 class="nav-section-title">Gestión</h6>
+          <ul>
+            <li class="nav-item"><a href="providers.html" class="nav-link"><i class="bi bi-building"></i><span class="nav-link-text">Proveedores</span></a></li>
+            <li class="nav-item"><a href="products.html" class="nav-link active"><i class="bi bi-box-seam"></i><span class="nav-link-text">Productos</span></a></li>
+            <li class="nav-item"><a href="categories.html" class="nav-link"><i class="bi bi-tags"></i><span class="nav-link-text">Categorías</span></a></li>
+          </ul>
+        </div>
+        <div class="nav-section">
+          <h6 class="nav-section-title">Análisis</h6>
+          <ul>
+            <li class="nav-item"><a href="compare.html" class="nav-link"><i class="bi bi-graph-up-arrow"></i><span class="nav-link-text">Comparativas</span></a></li>
+          </ul>
+        </div>
+        <div class="nav-section">
+          <h6 class="nav-section-title">Datos</h6>
+          <ul>
+            <li class="nav-item"><a href="ingest.html" class="nav-link"><i class="bi bi-cloud-upload"></i><span class="nav-link-text">Ingesta</span></a></li>
+          </ul>
+        </div>
+        <div class="nav-section">
+          <h6 class="nav-section-title">Sistema</h6>
+          <ul>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="bi bi-gear"></i><span class="nav-link-text">Configuración</span></a></li>
+          </ul>
+        </div>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+              <li class="breadcrumb-item active">Productos</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-actions">
+            <div id="dummy-badge" class="dummy-badge" style="display: none;"><i class="bi bi-database"></i><span>Modo Dummy</span></div>
+            <button class="topbar-btn" id="dark-mode-toggle"><i class="bi bi-moon-stars"></i></button>
+            <div class="dropdown">
+              <button class="topbar-btn" type="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header" id="user-email">Admin</h6></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <div class="content-area">
+        <div class="page-header">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+              <h1 class="page-title">Productos & Precios</h1>
+              <p class="page-description">Gestión de productos, precios e histórico</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-primary" id="export-btn"><i class="bi bi-download me-2"></i>Exportar CSV</button>
+              <button class="btn btn-primary" id="new-product-btn"><i class="bi bi-plus-lg me-2"></i>Nuevo Producto</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text" class="form-control" id="search-input" placeholder="Buscar por SKU o nombre...">
+                </div>
+              </div>
+              <div class="col-12 col-md-3">
+                <select class="form-select" id="category-filter">
+                  <option value="">Todas las categorías</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3">
+                <select class="form-select" id="sort-select">
+                  <option value="name-asc">Nombre (A-Z)</option>
+                  <option value="name-desc">Nombre (Z-A)</option>
+                  <option value="sku-asc">SKU (A-Z)</option>
+                  <option value="price-desc">Precio (Mayor)</option>
+                  <option value="price-asc">Precio (Menor)</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-2">
+                <button class="btn btn-outline-secondary w-100" id="clear-filters-btn"><i class="bi bi-x-circle me-2"></i>Limpiar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th>COGS</th>
+                    <th>Precio Neto</th>
+                    <th>Precio Bruto</th>
+                    <th>Margen</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body">
+                  <tr><td colspan="9" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <div class="text-muted">Mostrando <span id="showing-from">0</span> a <span id="showing-to">0</span> de <span id="total-records">0</span> registros</div>
+              <nav><ul class="pagination mb-0" id="pagination"></ul></nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="productModalLabel">Nuevo Producto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="product-form">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="product-sku" class="form-label">SKU *</label>
+                <input type="text" class="form-control" id="product-sku" required>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="product-name" class="form-label">Nombre *</label>
+                <input type="text" class="form-control" id="product-name" required>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="product-category" class="form-label">Categoría *</label>
+                <select class="form-select" id="product-category" required></select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="product-provider" class="form-label">Proveedor *</label>
+                <select class="form-select" id="product-provider" required></select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label for="product-cogs" class="form-label">COGS *</label>
+                <input type="number" class="form-control" id="product-cogs" step="0.01" required>
+              </div>
+              <div class="col-12 col-md-4">
+                <label for="product-price-net" class="form-label">Precio Neto *</label>
+                <input type="number" class="form-control" id="product-price-net" step="0.01" required>
+              </div>
+              <div class="col-12 col-md-4">
+                <label for="product-tax-rate" class="form-label">IVA (%)</label>
+                <input type="number" class="form-control" id="product-tax-rate" value="15" step="0.01">
+              </div>
+              <div class="col-12">
+                <label for="product-notes" class="form-label">Notas</label>
+                <textarea class="form-control" id="product-notes" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="js/views/products.js"></script>
+</body>
+</html>
