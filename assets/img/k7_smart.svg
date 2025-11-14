@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 337.55 81.44">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: 0em;
+      }
+
+      .cls-2 {
+        fill: #ff5a19;
+        font-family: Bahnschrift, Bahnschrift;
+        font-variation-settings: 'wght' 400, 'wdth' 100;
+        letter-spacing: -.05em;
+      }
+
+      .cls-2, .cls-3 {
+        font-size: 72.36px;
+      }
+
+      .cls-3 {
+        font-family: FONTSPRINGDEMO-NoveraClassicBlackRegular, 'FONTSPRING DEMO - Novera Classic Black';
+      }
+
+      .cls-4 {
+        font-family: Bahnschrift-SemiBoldSemiCondensed, Bahnschrift;
+        font-size: 13.11px;
+        font-variation-settings: 'wght' 600, 'wdth' 87;
+        font-weight: 600;
+      }
+
+      .cls-5 {
+        letter-spacing: 0em;
+      }
+    </style>
+  </defs>
+  <text class="cls-3" transform="translate(59.61 61.86)"><tspan x="0" y="0">K7</tspan></text>
+  <text class="cls-2" transform="translate(152.51 61.86)"><tspan x="0" y="0">Smart</tspan></text>
+  <g>
+    <path d="M42.56,35.42c-3.13,6.45-9.76,11.05-17.5,11.05-10.5,0-19.35-8.66-19.35-19.35S14.19,7.79,25.06,7.79c5.16,0,10.13,2.03,13.82,5.71,2.21,2.21,3.68,4.79,4.61,7.55l4.24-4.24c-1.29-2.76-2.95-5.16-5.16-7.37-4.79-4.61-11.05-7.37-17.69-7.37C11.24,2.26,0,13.5,0,27.13s11.24,24.87,24.87,24.87c12.9,0,23.21-9.76,24.69-21.74-2.76,2.58-3.87,5.16-7,5.16Z"/>
+    <path d="M58.22,60.3c-2.76,2.76-7.37,2.76-10.32,0l-8.48-8.48c2.03-1.29,4.05-2.76,5.71-4.42,1.84-1.84,3.32-3.68,4.61-5.9l8.48,8.48c2.76,2.76,2.95,7.37,0,10.32Z"/>
+    <path d="M56.56,18.29l-3.5,3.5-9.58,9.4c-.74.74-1.84.74-2.58,0l-6.08-6.08-9.58,9.58c-.74.74-1.84.74-2.58,0l-4.24-4.24-6.08,6.08c-.74-.92-1.47-2.21-2.03-3.32l6.82-6.45c.74-.74,1.84-.74,2.58,0l4.24,4.24,9.58-9.58c.74-.74,1.84-.74,2.58,0l4.42,4.42,1.66,1.66,9.76-9.76,2.03-2.03c.74-.74,1.84-.74,2.58,0s.74,1.84,0,2.58h0Z"/>
+  </g>
+  <text class="cls-4" transform="translate(202.54 74.78)"><tspan x="0" y="0">Visión c</tspan><tspan class="cls-5" x="39.1" y="0">l</tspan><tspan class="cls-1" x="42.45" y="0">ara,acción rápida</tspan></text>
+</svg>

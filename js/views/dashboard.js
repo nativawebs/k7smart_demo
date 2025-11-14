@@ -113,13 +113,18 @@ function updateDummyUI() {
   const isDummy = state.getState().dummyMode;
   const badge = document.getElementById('dummy-badge');
   const btnText = document.getElementById('dummy-btn-text');
+  const toggleBtn = document.getElementById('toggle-dummy-btn');
   
   if (badge) {
     badge.style.display = isDummy ? 'flex' : 'none';
   }
   
   if (btnText) {
-    btnText.textContent = isDummy ? 'Activar Datos Reales' : 'Activar Modo Dummy';
+    btnText.textContent = isDummy ? 'Usar Datos Reales' : 'Usar Datos Dummy';
+  }
+  
+  if (toggleBtn) {
+    toggleBtn.className = isDummy ? 'btn btn-success' : 'btn btn-outline-primary';
   }
 }
 

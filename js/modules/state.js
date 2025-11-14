@@ -104,7 +104,7 @@ class StateManager {
    */
   getDummyMode() {
     const stored = localStorage.getItem('k7_dummy_mode');
-    return stored ? JSON.parse(stored) : true; // Default to true
+    return stored ? JSON.parse(stored) : false; // Default to false (real data)
   }
 
   /**

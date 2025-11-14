@@ -7,11 +7,11 @@
 export const config = {
   // Supabase Configuration
   // Reemplaza estos valores con tus credenciales reales de Supabase
-  supabaseUrl: 'YOUR_SUPABASE_URL_HERE',
-  supabaseAnonKey: 'YOUR_SUPABASE_ANON_KEY_HERE',
+  supabaseUrl: 'https://qvpebnzbjgnneieopitv.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2cGVibnpiamdubmVpZW9waXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzkwMjAsImV4cCI6MjA3ODU1NTAyMH0.mrIph7DHmgM2o7i5UiCy0CwMUJ-N70QGL_LlfQWfLaE',
   
   // n8n Webhook (opcional)
-  n8nIngestUrl: 'https://your-n8n-instance.com/webhook/ingest',
+  n8nIngestUrl: 'https://n8n.srv888919.hstgr.cloud/webhook-test/ingest',
   
   // App Settings
   defaultTaxRate: 0.15,
