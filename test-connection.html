@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test de Conexión - Kiosko7</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .test-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+
+    .test-section h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .test-info {
+      margin-top: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .test-info code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .test-info pre {
+      background: #1f2937;
+      color: #10b981;
+      padding: 12px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .error-message {
+      color: #dc2626;
+      margin-top: 8px;
+      padding: 8px;
+      background: #fee2e2;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .icon {
+      font-size: 20px;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 Test de Conexión</h1>
+    <p class="subtitle">Verificación de Supabase y n8n</p>
+
+    <!-- Test 1: Configuración -->
+    <div class="test-section">
+      <h2>
+        <span class="icon">⚙️</span>
+        1. Configuración
+        <span id="status-config" class="status pending">Pendiente</span>
+      </h2>
+      <div id="info-config" class="test-info" style="display: none;"></div>
+    </div>
+
+    <!-- Test 2: Supabase Client -->
+    <div class="test-section">
+      <h2>
+        <span class="icon">🔌</span>
+        2. Cliente Supabase
+        <span id="status-client" class="status pending">Pendiente</span>
+      </h2>
+      <div id="info-client" class="test-info" style="display: none;"></div>
+    </div>
+
+    <!-- Test 3: Conexión a Base de Datos -->
+    <div class="test-section">
+      <h2>
+        <span class="icon">💾</span>
+        3. Conexión a Base de Datos
+        <span id="status-db" class="status pending">Pendiente</span>
+      </h2>
+      <div id="info-db" class="test-info" style="display: none;"></div>
+    </div>
+
+    <!-- Test 4: n8n Webhook -->
+    <div class="test-section">
+      <h2>
+        <span class="icon">🔗</span>
+        4. Webhook n8n
+        <span id="status-n8n" class="status pending">Pendiente</span>
+      </h2>
+      <div id="info-n8n" class="test-info" style="display: none;"></div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-test" onclick="runTests()">▶️ Ejecutar Tests</button>
+      <button onclick="window.location.href='login.html'">← Volver al Login</button>
+    </div>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script type="module">
+    import { config } from './js/config.js';
+
+    let supabaseClient = null;
+
+    function updateStatus(testId, status, message, details = null) {
+      const statusEl = document.getElementById(`status-${testId}`);
+      const infoEl = document.getElementById(`info-${testId}`);
+      
+      statusEl.className = `status ${status}`;
+      statusEl.textContent = status === 'pending' ? 'Pendiente' : 
+                            status === 'success' ? '✓ Exitoso' : 
+                            '✗ Error';
+      
+      if (message) {
+        infoEl.style.display = 'block';
+        let html = `<p>${message}</p>`;
+        
+        if (details) {
+          html += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+        }
+        
+        infoEl.innerHTML = html;
+      }
+    }
+
+    async function test1_Config() {
+      console.log('🧪 Test 1: Verificando configuración...');
+      
+      try {
+        const hasUrl = config.supabaseUrl && config.supabaseUrl !== 'YOUR_SUPABASE_URL';
+        const hasKey = config.supabaseAnonKey && config.supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY';
+        const hasN8n = config.n8nIngestUrl && config.n8nIngestUrl.length > 0;
+
+        if (!hasUrl || !hasKey) {
+          updateStatus('config', 'error', 
+            '❌ Credenciales de Supabase no configuradas correctamente en config.js',
+            {
+              supabaseUrl: hasUrl ? '✓ Configurada' : '✗ Falta configurar',
+              supabaseAnonKey: hasKey ? '✓ Configurada' : '✗ Falta configurar',
+              n8nIngestUrl: hasN8n ? '✓ Configurada' : '⚠️ Opcional'
+            }
+          );
+          return false;
+        }
+
+        updateStatus('config', 'success', 
+          '✅ Configuración correcta',
+          {
+            supabaseUrl: config.supabaseUrl,
+            n8nIngestUrl: hasN8n ? config.n8nIngestUrl : 'No configurada (opcional)',
+            defaultTaxRate: config.defaultTaxRate
+          }
+        );
+        return true;
+      } catch (error) {
+        updateStatus('config', 'error', `Error: ${error.message}`);
+        return false;
+      }
+    }
+
+    async function test2_Client() {
+      console.log('🧪 Test 2: Inicializando cliente Supabase...');
+      
+      try {
+        if (typeof supabase === 'undefined') {
+          updateStatus('client', 'error', '❌ Librería de Supabase no cargada');
+          return false;
+        }
+
+        supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+        
+        if (!supabaseClient) {
+          updateStatus('client', 'error', '❌ No se pudo crear el cliente de Supabase');
+          return false;
+        }
+
+        updateStatus('client', 'success', 
+          '✅ Cliente Supabase inicializado correctamente',
+          {
+            url: config.supabaseUrl,
+            keyLength: config.supabaseAnonKey.length + ' caracteres'
+          }
+        );
+        return true;
+      } catch (error) {
+        updateStatus('client', 'error', `Error: ${error.message}`);
+        return false;
+      }
+    }
+
+    async function test3_Database() {
+      console.log('🧪 Test 3: Probando conexión a base de datos...');
+      
+      try {
+        // Intentar leer la tabla de settings
+        const { data, error } = await supabaseClient
+          .from('settings')
+          .select('key, value')
+          .limit(5);
+
+        if (error) {
+          updateStatus('db', 'error', 
+            `❌ Error al conectar con la base de datos: ${error.message}`,
+            {
+              code: error.code,
+              details: error.details,
+              hint: error.hint
+            }
+          );
+          return false;
+        }
+
+        updateStatus('db', 'success', 
+          `✅ Conexión exitosa a la base de datos. Se encontraron ${data.length} configuraciones.`,
+          data
+        );
+        return true;
+      } catch (error) {
+        updateStatus('db', 'error', `Error: ${error.message}`);
+        return false;
+      }
+    }
+
+    async function test4_N8n() {
+      console.log('🧪 Test 4: Verificando webhook n8n...');
+      
+      try {
+        if (!config.n8nIngestUrl || config.n8nIngestUrl.length === 0) {
+          updateStatus('n8n', 'pending', 
+            '⚠️ URL de webhook n8n no configurada (opcional)',
+            {
+              nota: 'Puedes configurar la URL en Settings o en config.js'
+            }
+          );
+          return true; // No es crítico
+        }
+
+        // Intentar hacer ping al webhook
+        const response = await fetch(config.n8nIngestUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            test: true,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          updateStatus('n8n', 'success', 
+            '✅ Webhook n8n responde correctamente',
+            {
+              url: config.n8nIngestUrl,
+              status: response.status,
+              response: data
+            }
+          );
+          return true;
+        } else {
+          updateStatus('n8n', 'error', 
+            `⚠️ Webhook responde pero con error HTTP ${response.status}`,
+            {
+              url: config.n8nIngestUrl,
+              status: response.status,
+              statusText: response.statusText
+            }
+          );
+          return false;
+        }
+      } catch (error) {
+        updateStatus('n8n', 'error', 
+          `❌ No se pudo conectar al webhook: ${error.message}`,
+          {
+            url: config.n8nIngestUrl,
+            error: error.message
+          }
+        );
+        return false;
+      }
+    }
+
+    window.runTests = async function() {
+      const btn = document.getElementById('btn-test');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> Ejecutando...';
+
+      // Reset all statuses
+      ['config', 'client', 'db', 'n8n'].forEach(id => {
+        updateStatus(id, 'pending', null);
+        document.getElementById(`info-${id}`).style.display = 'none';
+      });
+
+      // Run tests sequentially
+      const test1 = await test1_Config();
+      if (!test1) {
+        btn.disabled = false;
+        btn.innerHTML = '▶️ Ejecutar Tests';
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const test2 = await test2_Client();
+      if (!test2) {
+        btn.disabled = false;
+        btn.innerHTML = '▶️ Ejecutar Tests';
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const test3 = await test3_Database();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      await test4_N8n();
+
+      btn.disabled = false;
+      btn.innerHTML = '▶️ Ejecutar Tests';
+
+      // Show summary
+      if (test1 && test2 && test3) {
+        alert('✅ Todos los tests críticos pasaron exitosamente!\n\nPuedes proceder a usar la aplicación.');
+      } else {
+        alert('⚠️ Algunos tests fallaron. Revisa los detalles arriba.');
+      }
+    };
+  </script>
+</body>
+</html>

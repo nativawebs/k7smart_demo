@@ -384,10 +384,14 @@ function openProviderModal(provider = null) {
     document.getElementById('provider-ruc').value = provider.ruc || '';
     document.getElementById('provider-email').value = provider.email || '';
     document.getElementById('provider-phone').value = provider.phone || '';
+    document.getElementById('provider-city').value = provider.city || '';
+    document.getElementById('provider-location').value = provider.location || '';
     document.getElementById('provider-commission').value = provider.commission_rate || '';
+    document.getElementById('provider-delivery-time').value = provider.delivery_time_days || '';
     document.getElementById('provider-status').value = provider.status || 'active';
     document.getElementById('provider-zones').value = provider.zones || '';
     document.getElementById('provider-shipping').value = provider.shipping_cost_policy || '';
+    document.getElementById('provider-delivery-notes').value = provider.delivery_notes || '';
   } else {
     document.getElementById('provider-form').reset();
   }
@@ -441,10 +445,14 @@ async function saveProvider() {
   const ruc = document.getElementById('provider-ruc').value.trim();
   const email = document.getElementById('provider-email').value.trim();
   const phone = document.getElementById('provider-phone').value.trim();
+  const city = document.getElementById('provider-city').value.trim();
+  const location = document.getElementById('provider-location').value.trim();
   const commission = document.getElementById('provider-commission').value;
+  const deliveryTime = document.getElementById('provider-delivery-time').value;
   const status = document.getElementById('provider-status').value;
   const zones = document.getElementById('provider-zones').value.trim();
   const shipping = document.getElementById('provider-shipping').value.trim();
+  const deliveryNotes = document.getElementById('provider-delivery-notes').value.trim();
   
   // Validate
   if (!name || !ruc || !email || !phone) {
@@ -472,10 +480,14 @@ async function saveProvider() {
     ruc,
     email,
     phone,
+    city,
+    location,
     commission_rate: commission ? parseFloat(commission) : null,
+    delivery_time_days: deliveryTime ? parseInt(deliveryTime) : null,
     status,
     zones,
-    shipping_cost_policy: shipping
+    shipping_cost_policy: shipping,
+    delivery_notes: deliveryNotes
   };
   
   showLoading(editingProviderId ? 'Actualizando proveedor...' : 'Creando proveedor...');

@@ -103,8 +103,10 @@ class StateManager {
    * Get dummy mode from localStorage
    */
   getDummyMode() {
-    const stored = localStorage.getItem('k7_dummy_mode');
-    return stored ? JSON.parse(stored) : false; // Default to false (real data)
+    // PRODUCTION MODE: Always return false (disabled dummy mode)
+    // Clear any stored dummy mode setting
+    localStorage.removeItem('k7_dummy_mode');
+    return false; // Always use real data from Supabase
   }
 
   /**

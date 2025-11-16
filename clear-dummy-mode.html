@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Limpiar Modo Dummy</title>
+</head>
+<body>
+  <h1>Limpiando modo dummy...</h1>
+  <script>
+    // Limpiar localStorage
+    localStorage.removeItem('k7_dummy_mode');
+    localStorage.clear();
+    
+    alert('Modo dummy limpiado. Serás redirigido al login.');
+    window.location.href = 'login.html';
+  </script>
+</body>
+</html>

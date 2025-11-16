@@ -5,18 +5,14 @@
 
 import state from './state.js';
 import { showToast, showLoading, hideLoading } from './utils.js';
-
-// Supabase configuration
-// In production, these should come from environment variables
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+import { config } from '../config.js';
 
 let supabaseClient = null;
 
 /**
  * Initialize Supabase client
  */
-export function initSupabase(url = SUPABASE_URL, key = SUPABASE_ANON_KEY) {
+export function initSupabase(url = config.supabaseUrl, key = config.supabaseAnonKey) {
   if (typeof supabase === 'undefined') {
     console.error('Supabase library not loaded');
     return null;

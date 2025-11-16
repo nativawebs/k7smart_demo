@@ -279,8 +279,20 @@
                 <input type="tel" class="form-control" id="provider-phone" required>
               </div>
               <div class="col-12 col-md-6">
+                <label for="provider-city" class="form-label">Ciudad</label>
+                <input type="text" class="form-control" id="provider-city" placeholder="Ej: Montevideo">
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="provider-location" class="form-label">Ubicación/Dirección</label>
+                <input type="text" class="form-control" id="provider-location" placeholder="Ej: Av. 18 de Julio 1234">
+              </div>
+              <div class="col-12 col-md-6">
                 <label for="provider-commission" class="form-label">Comisión (%)</label>
                 <input type="number" class="form-control" id="provider-commission" step="0.01" min="0" max="100">
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="provider-delivery-time" class="form-label">Tiempo de Entrega (días)</label>
+                <input type="number" class="form-control" id="provider-delivery-time" min="0" placeholder="Ej: 3">
               </div>
               <div class="col-12 col-md-6">
                 <label for="provider-status" class="form-label">Estado</label>
@@ -289,13 +301,17 @@
                   <option value="inactive">Inactivo</option>
                 </select>
               </div>
-              <div class="col-12">
+              <div class="col-12 col-md-6">
                 <label for="provider-zones" class="form-label">Zonas de Cobertura</label>
                 <input type="text" class="form-control" id="provider-zones" placeholder="Ej: Montevideo, Canelones">
               </div>
               <div class="col-12">
                 <label for="provider-shipping" class="form-label">Política de Envío</label>
                 <textarea class="form-control" id="provider-shipping" rows="2" placeholder="Ej: Gratis sobre $2000"></textarea>
+              </div>
+              <div class="col-12">
+                <label for="provider-delivery-notes" class="form-label">Notas de Entrega</label>
+                <textarea class="form-control" id="provider-delivery-notes" rows="2" placeholder="Información adicional sobre entregas"></textarea>
               </div>
             </div>
           </div>
