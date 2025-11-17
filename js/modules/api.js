@@ -40,28 +40,71 @@ export async function getKPIs() {
     const supabase = getSupabase();
     
     // Calculate KPIs from real data
-    // This is a simplified version - adjust based on your actual schema
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const sixtyDaysAgo = new Date();
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
     
-    // Sales
-    const { data: salesData, error: salesError } = await supabase
+    // Get current period data (last 30 days)
+    const { data: currentData, error: currentError } = await supabase
       .from('product_prices')
-      .select('price_gross')
+      .select('price_gross, price_net, cogs, shipping_cost')
       .gte('date', thirtyDaysAgo.toISOString().split('T')[0]);
     
-    if (salesError) throw salesError;
+    if (currentError) throw currentError;
     
-    const totalSales = salesData.reduce((sum, item) => sum + (item.price_gross || 0), 0);
+    // Get previous period data (30-60 days ago) for comparison
+    const { data: previousData, error: previousError } = await supabase
+      .from('product_prices')
+      .select('price_gross, price_net, cogs, shipping_cost')
+      .gte('date', sixtyDaysAgo.toISOString().split('T')[0])
+      .lt('date', thirtyDaysAgo.toISOString().split('T')[0]);
+    
+    if (previousError) throw previousError;
+    
+    // Calculate current period metrics
+    const totalSales = currentData.reduce((sum, item) => sum + (item.price_gross || 0), 0);
+    const totalRevenue = currentData.reduce((sum, item) => sum + (item.price_net || 0), 0);
+    const totalCosts = currentData.reduce((sum, item) => sum + (item.cogs || 0) + (item.shipping_cost || 0), 0);
+    const totalMargin = totalRevenue - totalCosts;
+    const marginPercent = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
+    const aov = currentData.length > 0 ? totalSales / currentData.length : 0;
+    
+    // Calculate previous period metrics for comparison
+    const prevTotalSales = previousData.reduce((sum, item) => sum + (item.price_gross || 0), 0);
+    const prevTotalRevenue = previousData.reduce((sum, item) => sum + (item.price_net || 0), 0);
+    const prevTotalCosts = previousData.reduce((sum, item) => sum + (item.cogs || 0) + (item.shipping_cost || 0), 0);
+    const prevTotalMargin = prevTotalRevenue - prevTotalCosts;
+    const prevMarginPercent = prevTotalRevenue > 0 ? (prevTotalMargin / prevTotalRevenue) * 100 : 0;
+    const prevAov = previousData.length > 0 ? prevTotalSales / previousData.length : 0;
+    
+    // Calculate changes
+    const salesChange = prevTotalSales > 0 ? ((totalSales - prevTotalSales) / prevTotalSales) * 100 : 0;
+    const aovChange = prevAov > 0 ? ((aov - prevAov) / prevAov) * 100 : 0;
+    const marginChange = prevMarginPercent > 0 ? ((marginPercent - prevMarginPercent) / prevMarginPercent) * 100 : 0;
+    
+    // ROAS calculation (assuming ad spend is tracked - using a placeholder for now)
+    // You may need to adjust this based on your actual ad spend tracking
+    const adSpend = totalSales * 0.15; // Placeholder: assuming 15% of sales as ad spend
+    const roas = adSpend > 0 ? totalRevenue / adSpend : 0;
+    const prevAdSpend = prevTotalSales * 0.15;
+    const prevRoas = prevAdSpend > 0 ? prevTotalRevenue / prevAdSpend : 0;
+    const roasChange = prevRoas > 0 ? ((roas - prevRoas) / prevRoas) * 100 : 0;
+    
+    // Conversion rate calculation (placeholder - adjust based on your tracking)
+    // Assuming conversion rate based on orders vs visits (you may need to track this separately)
+    const conversionRate = currentData.length > 0 ? (currentData.length / (currentData.length * 25)) * 100 : 0; // Placeholder formula
+    const prevConversionRate = previousData.length > 0 ? (previousData.length / (previousData.length * 25)) * 100 : 0;
+    const conversionChange = prevConversionRate > 0 ? ((conversionRate - prevConversionRate) / prevConversionRate) * 100 : 0;
     
     return {
       success: true,
       data: {
-        sales: { value: totalSales, change: 12.5, trend: 'up' },
-        aov: { value: totalSales / (salesData.length || 1), change: 8.3, trend: 'up' },
-        margin: { value: 25.4, change: 3.2, trend: 'up' },
-        roas: { value: 3.8, change: 15.7, trend: 'up' },
-        conversion: { value: 4.2, change: 5.1, trend: 'up' }
+        sales: { value: totalSales, change: salesChange, trend: salesChange >= 0 ? 'up' : 'down' },
+        aov: { value: aov, change: aovChange, trend: aovChange >= 0 ? 'up' : 'down' },
+        margin: { value: marginPercent, change: marginChange, trend: marginChange >= 0 ? 'up' : 'down' },
+        roas: { value: roas, change: roasChange, trend: roasChange >= 0 ? 'up' : 'down' },
+        conversion: { value: conversionRate, change: conversionChange, trend: conversionChange >= 0 ? 'up' : 'down' }
       }
     };
   } catch (error) {
@@ -119,20 +162,66 @@ export async function getTopCategories(limit = 5) {
   try {
     const supabase = getSupabase();
     
-    const { data, error } = await supabase
+    // Get products with their categories and prices
+    const { data: products, error: productsError } = await supabase
       .from('products')
       .select(`
+        id,
         category_id,
-        categories(name),
-        product_prices(price_gross, price_net, cogs)
-      `)
-      .limit(100);
+        categories(name)
+      `);
     
-    if (error) throw error;
+    if (productsError) throw productsError;
     
-    // Process and aggregate by category
-    // This is simplified - adjust based on your needs
-    return { success: true, data: dummy.getDummyTopCategories(limit) };
+    // Get recent prices (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const { data: prices, error: pricesError } = await supabase
+      .from('product_prices')
+      .select('product_id, price_gross, price_net, cogs, shipping_cost')
+      .gte('date', thirtyDaysAgo.toISOString().split('T')[0]);
+    
+    if (pricesError) throw pricesError;
+    
+    // Aggregate by category
+    const categoryStats = {};
+    
+    prices.forEach(price => {
+      const product = products.find(p => p.id === price.product_id);
+      if (!product || !product.categories) return;
+      
+      const categoryName = product.categories.name;
+      
+      if (!categoryStats[categoryName]) {
+        categoryStats[categoryName] = {
+          category: categoryName,
+          revenue: 0,
+          margin: 0,
+          units: 0,
+          margin_percent: 0
+        };
+      }
+      
+      const revenue = price.price_net || 0;
+      const costs = (price.cogs || 0) + (price.shipping_cost || 0);
+      const margin = revenue - costs;
+      
+      categoryStats[categoryName].revenue += price.price_gross || 0;
+      categoryStats[categoryName].margin += margin;
+      categoryStats[categoryName].units += 1;
+    });
+    
+    // Calculate margin percentages and sort by revenue
+    const categoriesArray = Object.values(categoryStats)
+      .map(cat => ({
+        ...cat,
+        margin_percent: cat.revenue > 0 ? (cat.margin / cat.revenue) * 100 : 0
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, limit);
+    
+    return { success: true, data: categoriesArray };
   } catch (error) {
     return handleError(error, 'obtener top categorías');
   }
