@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="assets/css/custom.css">
 </head>
+
 <body>
   <div class="app-container">
     <aside class="sidebar" id="sidebar">
@@ -21,34 +23,50 @@
       <nav class="sidebar-nav">
         <div class="nav-section">
           <h6 class="nav-section-title">Principal</h6>
-          <ul><li class="nav-item"><a href="index.html" class="nav-link"><i class="bi bi-speedometer2"></i><span class="nav-link-text">Dashboard</span></a></li></ul>
+          <ul>
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="bi bi-speedometer2"></i><span
+                  class="nav-link-text">Dashboard</span></a></li>
+          </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Gestión</h6>
           <ul>
-            <li class="nav-item"><a href="providers.html" class="nav-link"><i class="bi bi-building"></i><span class="nav-link-text">Proveedores</span></a></li>
-            <li class="nav-item"><a href="products.html" class="nav-link"><i class="bi bi-box-seam"></i><span class="nav-link-text">Productos</span></a></li>
-            <li class="nav-item"><a href="categories.html" class="nav-link"><i class="bi bi-tags"></i><span class="nav-link-text">Categorías</span></a></li>
+            <li class="nav-item"><a href="providers.html" class="nav-link"><i class="bi bi-building"></i><span
+                  class="nav-link-text">Proveedores</span></a></li>
+            <li class="nav-item"><a href="products.html" class="nav-link"><i class="bi bi-box-seam"></i><span
+                  class="nav-link-text">Productos</span></a></li>
+            <li class="nav-item"><a href="categories.html" class="nav-link"><i class="bi bi-tags"></i><span
+                  class="nav-link-text">Categorías</span></a></li>
           </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Análisis</h6>
           <ul>
-            <li class="nav-item"><a href="compare.html" class="nav-link active"><i class="bi bi-graph-up-arrow"></i><span class="nav-link-text">Comparativas</span></a></li>
-            <li class="nav-item"><a href="providers-compare.html" class="nav-link"><i class="bi bi-arrow-left-right"></i><span class="nav-link-text">Comparar Proveedores</span></a></li>
+            <li class="nav-item"><a href="compare.html" class="nav-link active"><i
+                  class="bi bi-graph-up-arrow"></i><span class="nav-link-text">Comparativas</span></a></li>
+            <li class="nav-item"><a href="providers-compare.html" class="nav-link"><i
+                  class="bi bi-arrow-left-right"></i><span class="nav-link-text">Comparar Proveedores</span></a></li>
+            <li class="nav-item"><a href="scouting.html" class="nav-link"><i class="bi bi-search"></i><span
+                  class="nav-link-text">Scouting</span></a></li>
           </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Datos</h6>
-          <ul><li class="nav-item"><a href="ingest.html" class="nav-link"><i class="bi bi-cloud-upload"></i><span class="nav-link-text">Ingesta</span></a></li></ul>
+          <ul>
+            <li class="nav-item"><a href="ingest.html" class="nav-link"><i class="bi bi-cloud-upload"></i><span
+                  class="nav-link-text">Ingesta</span></a></li>
+          </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Sistema</h6>
-          <ul><li class="nav-item"><a href="settings.html" class="nav-link"><i class="bi bi-gear"></i><span class="nav-link-text">Configuración</span></a></li></ul>
+          <ul>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="bi bi-gear"></i><span
+                  class="nav-link-text">Configuración</span></a></li>
+          </ul>
         </div>
       </nav>
     </aside>
-    
+
     <main class="main-content">
       <header class="topbar">
         <div class="topbar-left">
@@ -61,26 +79,33 @@
         </div>
         <div class="topbar-right">
           <div class="topbar-actions">
-            <div id="dummy-badge" class="dummy-badge" style="display: none;"><i class="bi bi-database"></i><span>Modo Dummy</span></div>
-            <button class="topbar-btn" id="dark-mode-toggle"><i class="bi bi-moon-stars"></i></button>
+            
+            
+          <button class="topbar-btn" id="dark-mode-toggle"><i class="bi bi-moon-stars"></i></button>
             <div class="dropdown">
-              <button class="topbar-btn" type="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></button>
+              <button class="topbar-btn" type="button" data-bs-toggle="dropdown"><i
+                  class="bi bi-person-circle"></i></button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><h6 class="dropdown-header" id="user-email">Admin</h6></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+                <li>
+                  <h6 class="dropdown-header" id="user-email">Admin</h6>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="bi bi-box-arrow-right me-2"></i>Cerrar
+                    Sesión</a></li>
               </ul>
             </div>
           </div>
         </div>
       </header>
-      
+
       <div class="content-area">
         <div class="page-header">
           <h1 class="page-title">Comparativas de Precios</h1>
           <p class="page-description">Análisis comparativo de precios y márgenes por proveedor</p>
         </div>
-        
+
         <div class="card mb-4">
           <div class="card-body">
             <div class="row g-3">
@@ -91,24 +116,37 @@
                 </select>
               </div>
               <div class="col-12 col-md-3">
+                <label class="form-label">Producto Específico</label>
+                <select class="form-select" id="product-select">
+                  <option value="">Selecciona un producto...</option>
+                </select>
+                <small class="text-muted">Selecciona un producto para comparar entre proveedores</small>
+              </div>
+              <div class="col-12 col-md-3">
                 <label class="form-label">Proveedores</label>
                 <select class="form-select" id="providers-select" multiple size="3"></select>
+                <small class="text-muted">Opcional: filtra por proveedores específicos</small>
               </div>
-              <div class="col-12 col-md-2">
-                <label class="form-label">Desde</label>
-                <input type="date" class="form-control" id="date-from">
-              </div>
-              <div class="col-12 col-md-2">
-                <label class="form-label">Hasta</label>
-                <input type="date" class="form-control" id="date-to">
-              </div>
-              <div class="col-12 col-md-2 d-flex align-items-end">
-                <button class="btn btn-primary w-100" id="compare-btn"><i class="bi bi-search me-2"></i>Comparar</button>
+              <div class="col-12 col-md-3">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label">Desde</label>
+                    <input type="date" class="form-control" id="date-from">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">Hasta</label>
+                    <input type="date" class="form-control" id="date-to">
+                  </div>
+                  <div class="col-12">
+                    <button class="btn btn-primary w-100" id="compare-btn"><i
+                        class="bi bi-search me-2"></i>Comparar</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         <ul class="nav nav-tabs mb-4" role="tablist">
           <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#last-price-tab">Último Precio</button>
@@ -116,16 +154,42 @@
           <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#time-series-tab">Serie Temporal</button>
           </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#opportunities-tab">Oportunidades</button>
+          </li>
         </ul>
-        
+
         <div class="tab-content">
           <div class="tab-pane fade show active" id="last-price-tab">
             <div class="row g-4">
+              <div class="col-12">
+                <div class="card mb-3" id="product-info-card" style="display: none;">
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                      <div class="col-auto"><i class="bi bi-box-seam fs-1 text-primary"></i></div>
+                      <div class="col">
+                        <h5 class="mb-1" id="product-name-display">-</h5>
+                        <p class="mb-0 text-muted">
+                          <span class="badge bg-secondary me-2" id="product-sku-display">-</span>
+                          <span id="product-category-display">-</span>
+                        </p>
+                      </div>
+                      <div class="col-auto">
+                        <div class="text-end">
+                          <small class="text-muted d-block">Proveedores con este producto</small>
+                          <h4 class="mb-0 text-primary" id="providers-count-display">0</h4>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div class="col-12 col-xl-6">
                 <div class="card">
                   <div class="card-header d-flex justify-content-between">
-                    <h5 class="mb-0">Comparación de Precios</h5>
-                    <button class="btn btn-sm btn-outline-primary" id="export-last-btn"><i class="bi bi-download"></i></button>
+                    <h5 class="mb-0">Comparación de Precios por Proveedor</h5>
+                    <button class="btn btn-sm btn-outline-primary" id="export-last-btn"><i
+                        class="bi bi-download"></i></button>
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
@@ -133,9 +197,10 @@
                         <thead>
                           <tr>
                             <th>Proveedor</th>
-                            <th>Precio Neto</th>
-                            <th>Precio Bruto</th>
+                            <th>PVP sin IVA</th>
+                            <th>PVP</th>
                             <th>Margen %</th>
+                            <th>Mejor</th>
                           </tr>
                         </thead>
                         <tbody id="last-price-table"></tbody>
@@ -146,7 +211,9 @@
               </div>
               <div class="col-12 col-xl-6">
                 <div class="card">
-                  <div class="card-header"><h5 class="mb-0">Márgenes por Proveedor</h5></div>
+                  <div class="card-header">
+                    <h5 class="mb-0">Márgenes por Proveedor</h5>
+                  </div>
                   <div class="card-body">
                     <div class="chart-container">
                       <canvas id="margin-comparison-chart"></canvas>
@@ -156,14 +223,15 @@
               </div>
             </div>
           </div>
-          
+
           <div class="tab-pane fade" id="time-series-tab">
             <div class="row g-4">
               <div class="col-12">
                 <div class="card">
                   <div class="card-header d-flex justify-content-between">
                     <h5 class="mb-0">Evolución de Precios</h5>
-                    <button class="btn btn-sm btn-outline-primary" id="export-series-btn"><i class="bi bi-download"></i></button>
+                    <button class="btn btn-sm btn-outline-primary" id="export-series-btn"><i
+                        class="bi bi-download"></i></button>
                   </div>
                   <div class="card-body">
                     <div class="chart-container" style="height: 400px;">
@@ -174,12 +242,49 @@
               </div>
               <div class="col-12">
                 <div class="card">
-                  <div class="card-header"><h5 class="mb-0">Evolución de Márgenes</h5></div>
+                  <div class="card-header">
+                    <h5 class="mb-0">Evolución de Márgenes</h5>
+                  </div>
                   <div class="card-body">
                     <div class="chart-container" style="height: 400px;">
                       <canvas id="margin-series-chart"></canvas>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="opportunities-tab">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Oportunidades de Margen</h5>
+                <button class="btn btn-sm btn-outline-primary" id="refresh-opportunities-btn">
+                  <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>Producto Scouting</th>
+                        <th>Plataforma</th>
+                        <th>Precio (PVP)</th>
+                        <th>Mejor Opción Proveedor</th>
+                        <th>Costo</th>
+                        <th>Margen Potencial</th>
+                        <th>Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody id="opportunities-table-body">
+                      <tr>
+                        <td colspan="7" class="text-center py-5">
+                          <div class="spinner-border text-primary"></div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -194,4 +299,5 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="js/views/compare.js"></script>
 </body>
+
 </html>

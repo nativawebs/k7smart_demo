@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scouting - Kiosko7 Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <img src="assets/img/k7_smart.svg" alt="Kiosko7">
+                    <span class="sidebar-logo-text">k7</span>
+                </a>
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Principal</h6>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link">
+                                <i class="bi bi-speedometer2"></i>
+                                <span class="nav-link-text">Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Gestión</h6>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="providers.html" class="nav-link">
+                                <i class="bi bi-building"></i>
+                                <span class="nav-link-text">Proveedores</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="products.html" class="nav-link">
+                                <i class="bi bi-box-seam"></i>
+                                <span class="nav-link-text">Productos</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="categories.html" class="nav-link">
+                                <i class="bi bi-tags"></i>
+                                <span class="nav-link-text">Categorías</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Análisis</h6>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="compare.html" class="nav-link">
+                                <i class="bi bi-graph-up-arrow"></i>
+                                <span class="nav-link-text">Comparativas</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="providers-compare.html" class="nav-link">
+                                <i class="bi bi-arrow-left-right"></i>
+                                <span class="nav-link-text">Comparar Proveedores</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="scouting.html" class="nav-link active">
+                                <i class="bi bi-search"></i>
+                                <span class="nav-link-text">Scouting</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Datos</h6>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="sales.html" class="nav-link">
+                                <i class="bi bi-cash-coin"></i>
+                                <span class="nav-link-text">Ventas</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="ingest.html" class="nav-link">
+                                <i class="bi bi-cloud-upload"></i>
+                                <span class="nav-link-text">Ingesta</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <h6 class="nav-section-title">Sistema</h6>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="settings.html" class="nav-link">
+                                <i class="bi bi-gear"></i>
+                                <span class="nav-link-text">Configuración</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Scouting</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="topbar-actions">
+                        <!-- Dark Mode Toggle -->
+                        <button class="topbar-btn" id="dark-mode-toggle" title="Alternar tema">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+
+                        <!-- User Menu -->
+                        <div class="dropdown">
+                            <button class="topbar-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <h6 class="dropdown-header" id="user-email">Admin</h6>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" id="logout-btn">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title">Scouting & Matching</h1>
+                            <p class="page-description">Analiza productos de la competencia y compáralos con tu catálogo</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" id="new-scouting-btn">
+                                <i class="bi bi-plus-lg"></i> Nuevo Producto Scouting
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="search-input" placeholder="Buscar producto...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="platform-filter">
+                                    <option value="">Todas las plataformas</option>
+                                    <option value="MercadoLibre">MercadoLibre</option>
+                                    <option value="Tiendamia">Tiendamia</option>
+                                    <option value="Amazon">Amazon</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" id="date-filter">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" id="filter-btn">
+                                    <i class="bi bi-funnel"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto Competencia</th>
+                                        <th>Plataforma</th>
+                                        <th>Precio PVP</th>
+                                        <th>Categoría</th>
+                                        <th>Match</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scouting-table-body">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <div class="spinner-border text-primary"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <small class="text-muted" id="pagination-info">Mostrando 0-0 de 0</small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scouting Item Modal (CRUD) -->
+    <div class="modal fade" id="scoutingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scoutingModalLabel">Nuevo Producto Scouting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="scouting-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Producto *</label>
+                            <input type="text" class="form-control" id="scouting-name" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Plataforma *</label>
+                                <select class="form-select" id="scouting-platform" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="MercadoLibre">MercadoLibre</option>
+                                    <option value="Tiendamia">Tiendamia</option>
+                                    <option value="Amazon">Amazon</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Precio PVP *</label>
+                                <input type="number" step="0.01" class="form-control" id="scouting-pvp" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL del Producto</label>
+                            <input type="url" class="form-control" id="scouting-url" placeholder="https://...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Categoría Externa</label>
+                            <input type="text" class="form-control" id="scouting-category" placeholder="Ej: Electrónica">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Moneda</label>
+                                <select class="form-select" id="scouting-currency">
+                                    <option value="USD">USD</option>
+                                    <option value="UYU">UYU</option>
+                                    <option value="ARS">ARS</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stock Estimado</label>
+                                <input type="number" class="form-control" id="scouting-stock" placeholder="Opcional">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Modal -->
+    <div class="modal fade" id="matchModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Comparar con Productos de Proveedores</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-light border mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="mb-1" id="modal-scouting-name">Producto Competencia</h6>
+                                <div class="d-flex gap-3 text-muted small">
+                                    <span><i class="bi bi-shop"></i> <span id="modal-scouting-platform"></span></span>
+                                    <span><i class="bi bi-tag"></i> <span id="modal-scouting-price" class="fw-bold text-success"></span></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <span class="badge bg-info text-dark">Producto Ganador en Mercado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3"><i class="bi bi-building"></i> Productos Similares de tus Proveedores</h6>
+                    <div id="candidates-list" class="list-group mb-3">
+                        <!-- Candidates injected here -->
+                    </div>
+
+                    <div class="text-center py-4" id="loading-candidates" style="display: none;">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2 text-muted">Buscando productos similares...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Scouting Script -->
+    <script type="module" src="js/views/scouting.js"></script>
+</body>
+
+</html>

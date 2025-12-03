@@ -29,6 +29,8 @@ let currentSort = 'name';
 let currentSortOrder = 'asc';
 let editingProviderId = null;
 let providerModal = null;
+let selectedProviders = new Set();
+let allProviders = [];
 
 /**
  * Initialize providers page
@@ -57,9 +59,6 @@ async function init() {
     
     // Setup event listeners
     setupEventListeners();
-    
-    // Update UI based on state
-    updateDummyUI();
     
     // Load providers
     await loadProviders();
@@ -148,7 +147,13 @@ function setupEventListeners() {
   // Export button
   const exportBtn = document.getElementById('export-btn');
   exportBtn?.addEventListener('click', async () => {
-    await exportProviders();
+    await exportSelectedProviders();
+  });
+  
+  // Select all checkbox
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  selectAllCheckbox?.addEventListener('change', (e) => {
+    handleSelectAll(e.target.checked);
   });
   
   // Provider form
@@ -158,11 +163,6 @@ function setupEventListeners() {
     await saveProvider();
   });
   
-  // Subscribe to dummy mode changes
-  state.subscribe('dummyMode', () => {
-    updateDummyUI();
-    loadProviders();
-  });
 }
 
 /**
@@ -172,18 +172,6 @@ function updateDarkModeIcon(isDark) {
   const icon = document.querySelector('#dark-mode-toggle i');
   if (icon) {
     icon.className = isDark ? 'bi bi-sun' : 'bi bi-moon-stars';
-  }
-}
-
-/**
- * Update dummy mode UI
- */
-function updateDummyUI() {
-  const isDummy = state.getState().dummyMode;
-  const badge = document.getElementById('dummy-badge');
-  
-  if (badge) {
-    badge.style.display = isDummy ? 'flex' : 'none';
   }
 }
 
@@ -212,8 +200,10 @@ async function loadProviders() {
     });
     
     if (result.success) {
+      allProviders = result.data;
       renderProviders(result.data);
       updatePagination(result.total, result.page, result.limit);
+      updateExportButton();
     } else {
       tbody.innerHTML = `
         <tr>
@@ -238,7 +228,7 @@ function renderProviders(providers) {
   if (providers.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" class="text-center py-5 text-muted">
+        <td colspan="9" class="text-center py-5 text-muted">
           <i class="bi bi-inbox fs-1"></i>
           <p class="mt-2">No se encontraron proveedores</p>
         </td>
@@ -250,17 +240,34 @@ function renderProviders(providers) {
   tbody.innerHTML = providers.map(provider => `
     <tr>
       <td>
+        <input 
+          type="checkbox" 
+          class="form-check-input provider-checkbox" 
+          data-provider-id="${provider.id}"
+          ${selectedProviders.has(provider.id) ? 'checked' : ''}
+          onchange="window.handleProviderCheckbox('${provider.id}', this.checked)"
+        >
+      </td>
+      <td>
         <div class="fw-semibold">${provider.name}</div>
         <small class="text-muted">${formatDate(provider.created_at)}</small>
       </td>
       <td>${provider.ruc}</td>
       <td>
+        ${provider.contact_person ? `<div><i class="bi bi-person me-1"></i><strong>${provider.contact_person}</strong></div>` : ''}
         <div><i class="bi bi-envelope me-1"></i>${provider.email}</div>
         <div><i class="bi bi-telephone me-1"></i>${provider.phone}</div>
+        ${provider.whatsapp ? `<div><a href="https://wa.me/${provider.whatsapp}" target="_blank" class="text-success"><i class="bi bi-whatsapp me-1"></i>${provider.whatsapp}</a></div>` : ''}
+        ${provider.website ? `<div><a href="${provider.website}" target="_blank" class="text-primary"><i class="bi bi-globe me-1"></i>Web</a></div>` : ''}
       </td>
       <td>${provider.commission_rate ? provider.commission_rate + '%' : '-'}</td>
       <td>
         <small>${provider.zones || '-'}</small>
+      </td>
+      <td>
+        <span class="badge ${provider.dropshipping ? 'bg-info' : 'bg-secondary'}">
+          ${provider.dropshipping ? 'Sí' : 'No'}
+        </span>
       </td>
       <td>
         <span class="badge ${provider.status === 'active' ? 'bg-success' : 'bg-secondary'}">
@@ -279,6 +286,9 @@ function renderProviders(providers) {
       </td>
     </tr>
   `).join('');
+  
+  // Update select all checkbox state
+  updateSelectAllCheckbox();
 }
 
 /**
@@ -384,16 +394,21 @@ function openProviderModal(provider = null) {
     document.getElementById('provider-ruc').value = provider.ruc || '';
     document.getElementById('provider-email').value = provider.email || '';
     document.getElementById('provider-phone').value = provider.phone || '';
+    document.getElementById('provider-contact-person').value = provider.contact_person || '';
     document.getElementById('provider-city').value = provider.city || '';
     document.getElementById('provider-location').value = provider.location || '';
     document.getElementById('provider-commission').value = provider.commission_rate || '';
     document.getElementById('provider-delivery-time').value = provider.delivery_time_days || '';
     document.getElementById('provider-status').value = provider.status || 'active';
+    document.getElementById('provider-whatsapp').value = provider.whatsapp || '';
+    document.getElementById('provider-website').value = provider.website || '';
     document.getElementById('provider-zones').value = provider.zones || '';
     document.getElementById('provider-shipping').value = provider.shipping_cost_policy || '';
     document.getElementById('provider-delivery-notes').value = provider.delivery_notes || '';
+    document.getElementById('provider-dropshipping').value = provider.dropshipping ? 'true' : 'false';
   } else {
     document.getElementById('provider-form').reset();
+    document.getElementById('provider-dropshipping').value = 'false';
   }
   
   providerModal.show();
@@ -445,28 +460,36 @@ async function saveProvider() {
   const ruc = document.getElementById('provider-ruc').value.trim();
   const email = document.getElementById('provider-email').value.trim();
   const phone = document.getElementById('provider-phone').value.trim();
+  const contactPerson = document.getElementById('provider-contact-person').value.trim();
   const city = document.getElementById('provider-city').value.trim();
   const location = document.getElementById('provider-location').value.trim();
   const commission = document.getElementById('provider-commission').value;
   const deliveryTime = document.getElementById('provider-delivery-time').value;
   const status = document.getElementById('provider-status').value;
+  const whatsapp = document.getElementById('provider-whatsapp').value.trim();
+  const website = document.getElementById('provider-website').value.trim();
   const zones = document.getElementById('provider-zones').value.trim();
   const shipping = document.getElementById('provider-shipping').value.trim();
   const deliveryNotes = document.getElementById('provider-delivery-notes').value.trim();
+  const dropshipping = document.getElementById('provider-dropshipping').value === 'true';
   
   // Validate
-  if (!name || !ruc || !email || !phone) {
+  if (!name || !email || !phone) {
     showToast('Por favor completa todos los campos requeridos', 'warning');
     return;
   }
+  
+  // Set default RUC if empty
+  const finalRuc = ruc || '1';
   
   if (!validateEmail(email)) {
     showToast('Email inválido', 'warning');
     return;
   }
   
-  if (!validateRUC(ruc)) {
-    showToast('RUC inválido (debe tener 12 dígitos)', 'warning');
+  // RUC validation: allow up to 13 digits or default value "1"
+  if (ruc !== '1' && (!/^\d{1,13}$/.test(ruc))) {
+    showToast('RUC inválido (debe tener hasta 13 dígitos o usar "1" como valor por defecto)', 'warning');
     return;
   }
   
@@ -477,9 +500,12 @@ async function saveProvider() {
   
   const providerData = {
     name,
-    ruc,
+    ruc: finalRuc,
     email,
     phone,
+    contact_person: contactPerson || null,
+    whatsapp: whatsapp || null,
+    website: website || null,
     city,
     location,
     commission_rate: commission ? parseFloat(commission) : null,
@@ -487,7 +513,8 @@ async function saveProvider() {
     status,
     zones,
     shipping_cost_policy: shipping,
-    delivery_notes: deliveryNotes
+    delivery_notes: deliveryNotes,
+    dropshipping
   };
   
   showLoading(editingProviderId ? 'Actualizando proveedor...' : 'Creando proveedor...');
@@ -508,13 +535,91 @@ async function saveProvider() {
 }
 
 /**
- * Export providers
+ * Handle individual provider checkbox
  */
-async function exportProviders() {
+window.handleProviderCheckbox = function(providerId, checked) {
+  if (checked) {
+    selectedProviders.add(providerId);
+  } else {
+    selectedProviders.delete(providerId);
+  }
+  updateSelectAllCheckbox();
+  updateExportButton();
+};
+
+/**
+ * Handle select all checkbox
+ */
+function handleSelectAll(checked) {
+  if (checked) {
+    allProviders.forEach(provider => {
+      selectedProviders.add(provider.id);
+    });
+  } else {
+    selectedProviders.clear();
+  }
+  
+  // Update all checkboxes in the table
+  document.querySelectorAll('.provider-checkbox').forEach(checkbox => {
+    checkbox.checked = checked;
+  });
+  
+  updateExportButton();
+}
+
+/**
+ * Update select all checkbox state
+ */
+function updateSelectAllCheckbox() {
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  if (!selectAllCheckbox) return;
+  
+  const totalProviders = allProviders.length;
+  const selectedCount = selectedProviders.size;
+  
+  if (selectedCount === 0) {
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.indeterminate = false;
+  } else if (selectedCount === totalProviders) {
+    selectAllCheckbox.checked = true;
+    selectAllCheckbox.indeterminate = false;
+  } else {
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.indeterminate = true;
+  }
+}
+
+/**
+ * Update export button state
+ */
+function updateExportButton() {
+  const exportBtn = document.getElementById('export-btn');
+  if (!exportBtn) return;
+  
+  const selectedCount = selectedProviders.size;
+  
+  if (selectedCount > 0) {
+    exportBtn.disabled = false;
+    exportBtn.innerHTML = `<i class="bi bi-download me-2"></i>Exportar Seleccionados (${selectedCount})`;
+  } else {
+    exportBtn.disabled = true;
+    exportBtn.innerHTML = `<i class="bi bi-download me-2"></i>Exportar Seleccionados (.xlsx)`;
+  }
+}
+
+/**
+ * Export selected providers
+ */
+async function exportSelectedProviders() {
+  if (selectedProviders.size === 0) {
+    showToast('Por favor selecciona al menos un proveedor para exportar', 'warning');
+    return;
+  }
+  
   try {
-    showLoading('Exportando proveedores...');
+    showLoading('Exportando proveedores seleccionados...');
     
-    // Get all providers (no pagination)
+    // Get all providers to filter selected ones
     const result = await api.getProviders({
       page: 1,
       limit: 1000,
@@ -526,19 +631,27 @@ async function exportProviders() {
     hideLoading();
     
     if (result.success && result.data) {
-      const exportData = result.data.map(p => ({
+      // Filter only selected providers
+      const selectedProvidersData = result.data.filter(p => selectedProviders.has(p.id));
+      
+      const exportData = selectedProvidersData.map(p => ({
         Nombre: p.name,
-        RUC: p.ruc,
+        RUC: p.ruc || '1',
+        'Persona de Contacto': p.contact_person || '',
+        WhatsApp: p.whatsapp || '',
+        'Sitio Web': p.website || '',
         Email: p.email,
         Teléfono: p.phone,
         'Comisión (%)': p.commission_rate || '',
         Zonas: p.zones || '',
         'Política de Envío': p.shipping_cost_policy || '',
+        Dropshipping: p.dropshipping ? 'Sí' : 'No',
         Estado: p.status,
         'Fecha de Creación': formatDate(p.created_at)
       }));
       
-      exportToCSV(exportData, `proveedores_${new Date().toISOString().split('T')[0]}.csv`);
+      exportToCSV(exportData, `proveedores_seleccionados_${new Date().toISOString().split('T')[0]}.xlsx`);
+      showToast(`${selectedProvidersData.length} proveedores exportados exitosamente`, 'success');
     }
   } catch (error) {
     hideLoading();
@@ -553,6 +666,15 @@ function setupKeyboardShortcuts() {
   let keys = {};
   
   document.addEventListener('keydown', (e) => {
+    // Don't trigger shortcuts if user is typing in an input/textarea
+    const isTyping = e.target.tagName === 'INPUT' || 
+                     e.target.tagName === 'TEXTAREA' || 
+                     e.target.isContentEditable;
+    
+    if (isTyping && e.key !== '/') {
+      return; // Allow normal typing in form fields
+    }
+    
     keys[e.key] = true;
     
     // g + d = Dashboard
@@ -579,8 +701,8 @@ function setupKeyboardShortcuts() {
       keys = {};
     }
     
-    // / = Focus search
-    if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+    // / = Focus search (only if not typing)
+    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !isTyping) {
       e.preventDefault();
       document.getElementById('search-input')?.focus();
     }

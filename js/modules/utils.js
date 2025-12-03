@@ -1,12 +1,206 @@
 /**
- * Utility Functions Module
- * Common helper functions used across the application
+ * K7Smart Utilities
+ * Funciones de ayuda para matching, formateo y cálculos.
  */
 
-/**
- * Debounce function - delays execution until after wait time
- */
-export function debounce(func, wait = 300) {
+export const utils = {
+  /**
+   * Calcula la distancia de Levenshtein entre dos cadenas.
+   * Retorna el número de operaciones (inserción, eliminación, sustitución) necesarias.
+   */
+  calculateLevenshteinDistance: (str1, str2) => {
+    const s1 = str1.toLowerCase();
+    const s2 = str2.toLowerCase();
+    const len1 = s1.length;
+    const len2 = s2.length;
+
+    // Crear matriz de distancias
+    const matrix = Array(len1 + 1).fill(null).map(() => Array(len2 + 1).fill(0));
+
+    // Inicializar primera fila y columna
+    for (let i = 0; i <= len1; i++) matrix[i][0] = i;
+    for (let j = 0; j <= len2; j++) matrix[0][j] = j;
+
+    // Calcular distancias
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,      // Eliminación
+          matrix[i][j - 1] + 1,      // Inserción
+          matrix[i - 1][j - 1] + cost // Sustitución
+        );
+      }
+    }
+
+    return matrix[len1][len2];
+  },
+
+  /**
+   * Calcula el score de similitud fuzzy entre dos cadenas usando Levenshtein.
+   * Retorna un valor entre 0 (totalmente diferente) y 1 (idéntico).
+   */
+  fuzzyMatch: (str1, str2) => {
+    if (!str1 || !str2) return 0;
+
+    const normalized1 = utils.normalizeProductName(str1);
+    const normalized2 = utils.normalizeProductName(str2);
+
+    if (normalized1 === normalized2) return 1;
+
+    const distance = utils.calculateLevenshteinDistance(normalized1, normalized2);
+    const maxLength = Math.max(normalized1.length, normalized2.length);
+
+    if (maxLength === 0) return 0;
+
+    return 1 - (distance / maxLength);
+  },
+
+  /**
+   * Normaliza un nombre de producto para comparación.
+   * Elimina caracteres especiales, convierte a minúsculas, elimina palabras comunes.
+   */
+  normalizeProductName: (name) => {
+    if (!name) return '';
+
+    // Palabras comunes a eliminar (stopwords en español)
+    const stopwords = ['de', 'la', 'el', 'los', 'las', 'un', 'una', 'y', 'o', 'para', 'con', 'en'];
+
+    return name
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+      .replace(/[^a-z0-9\s]/g, ' ') // Solo letras, números y espacios
+      .split(/\s+/)
+      .filter(word => word.length > 2 && !stopwords.includes(word))
+      .join(' ')
+      .trim();
+  },
+
+  /**
+   * Calcula el score de matching entre un item de scouting y un producto de proveedor.
+   * Score = 0.70*fuzzy_match + 0.30*category_match
+   */
+  calculateMatchScore: (scoutingItem, providerProduct, categoryMatch = 0) => {
+    const nameSimilarity = utils.fuzzyMatch(scoutingItem.name, providerProduct.name);
+    const score = (0.70 * nameSimilarity) + (0.30 * categoryMatch);
+    return Math.min(Math.max(score, 0), 1); // Clamp entre 0 y 1
+  },
+
+  /**
+   * Calcula la similitud de texto entre dos cadenas (Jaccard index simple de trigramas o palabras).
+   * Para simplicidad en cliente, usaremos tokens de palabras.
+   */
+  textSimilarity: (s1, s2) => {
+    if (!s1 || !s2) return 0;
+    const normalize = s => s.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+    const a = new Set(normalize(s1));
+    const b = new Set(normalize(s2));
+    const intersection = new Set([...a].filter(x => b.has(x)));
+    const union = new Set([...a, ...b]);
+    return union.size === 0 ? 0 : intersection.size / union.size;
+  },
+
+  /**
+   * Calcula el margen potencial entre precio de scouting y costo de proveedor.
+   * Retorna { margin_abs, margin_pct }
+   */
+  calculatePotentialMargin: (scoutingPvp, providerCost, taxRate = 0.15) => {
+    if (!scoutingPvp || !providerCost) {
+      return { margin_abs: 0, margin_pct: 0 };
+    }
+
+    const costWithTax = providerCost * (1 + taxRate);
+    const margin_abs = scoutingPvp - costWithTax;
+    const margin_pct = scoutingPvp > 0 ? (margin_abs / scoutingPvp) * 100 : 0;
+
+    return {
+      margin_abs: Math.round(margin_abs * 100) / 100,
+      margin_pct: Math.round(margin_pct * 100) / 100
+    };
+  },
+
+  /**
+   * Calcula la cercanía de precios.
+   * Penaliza si la diferencia es mayor al 60%.
+   * Retorna un valor entre 0 y 1.
+   */
+  priceNearness: (p1, p2) => {
+    if (!p1 || !p2 || p1 === 0 || p2 === 0) return 0;
+    const diff = Math.abs(p1 - p2);
+    const max = Math.max(p1, p2);
+    const pctDiff = diff / max;
+
+    if (pctDiff > 0.60) return 0; // Penalización fuerte
+    return 1 - pctDiff; // 1 si son iguales, 0.4 si diff es 60%
+  },
+
+  /**
+   * Normaliza un nombre para búsquedas.
+   */
+  normalizeName: (name) => {
+    return name ? name.toLowerCase().trim() : '';
+  },
+
+  /**
+   * Formatea moneda.
+   */
+  formatCurrency: (amount, currency = 'USD') => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(amount);
+  },
+
+  /**
+   * Formatea porcentaje.
+   */
+  formatPercent: (val) => {
+    return new Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(val);
+  }
+};
+
+// Export individual functions for convenience
+export const formatCurrency = (value) => {
+  if (value === null || value === undefined) return '$0.00';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+  }).format(value);
+};
+
+export const formatNumber = (value, decimals = 0) => {
+  if (value === null || value === undefined) return '0';
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(value);
+};
+
+export const formatPercentage = (value, decimals = 1) => {
+  if (value === null || value === undefined) return '0%';
+  return formatNumber(value, decimals) + '%';
+};
+
+export const formatDate = (date) => {
+  if (!date) return '';
+  return new Date(date).toLocaleDateString('es-ES');
+};
+
+export const showToast = (message, type = 'info') => {
+  // Simple toast implementation
+  console.log(`[${type.toUpperCase()}] ${message}`);
+  // TODO: Implement actual toast UI
+};
+
+export const showLoading = (message = 'Cargando...') => {
+  console.log(`[LOADING] ${message}`);
+  // TODO: Implement actual loading UI
+};
+
+export const hideLoading = () => {
+  console.log('[LOADING] Hidden');
+  // TODO: Implement actual loading UI
+};
+
+export const debounce = (func, wait) => {
   let timeout;
   return function executedFunction(...args) {
     const later = () => {
@@ -16,576 +210,55 @@ export function debounce(func, wait = 300) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
-}
+};
 
-/**
- * Format currency
- */
-export function formatCurrency(amount, currency = 'USD') {
-  return new Intl.NumberFormat('es-UY', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(amount);
-}
+export const calculateMargen = (pvp, costo, ivaRate = 0.15) => {
+  if (!pvp || !costo || pvp === 0) return 0;
+  const pvpSinIva = pvp / (1 + ivaRate);
+  const margen = ((pvpSinIva - costo) / pvpSinIva) * 100;
+  return Math.max(0, margen);
+};
 
-/**
- * Format number
- */
-export function formatNumber(number, decimals = 0) {
-  return new Intl.NumberFormat('es-UY', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  }).format(number);
-}
+export const confirm = async (message, title = 'Confirmar') => {
+  return window.confirm(message);
+};
 
-/**
- * Format percentage
- */
-export function formatPercentage(value, decimals = 2) {
-  return `${formatNumber(value, decimals)}%`;
-}
-
-/**
- * Format date
- */
-export function formatDate(date, format = 'short') {
-  const d = new Date(date);
-  
-  if (format === 'short') {
-    return d.toLocaleDateString('es-UY', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  } else if (format === 'long') {
-    return d.toLocaleDateString('es-UY', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  } else if (format === 'datetime') {
-    return d.toLocaleString('es-UY', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-  
-  return d.toLocaleDateString('es-UY');
-}
-
-/**
- * Format relative time (e.g., "hace 2 horas")
- */
-export function formatRelativeTime(date) {
-  const now = new Date();
-  const past = new Date(date);
-  const diffMs = now - past;
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSecs < 60) return 'hace unos segundos';
-  if (diffMins < 60) return `hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
-  if (diffHours < 24) return `hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
-  if (diffDays < 7) return `hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
-  
-  return formatDate(date);
-}
-
-/**
- * Show toast notification
- */
-export function showToast(message, type = 'info', duration = 3000) {
-  const toastContainer = document.getElementById('toast-container') || createToastContainer();
-  
-  const toastId = `toast-${Date.now()}`;
-  const iconMap = {
-    success: 'bi-check-circle-fill',
-    error: 'bi-x-circle-fill',
-    warning: 'bi-exclamation-triangle-fill',
-    info: 'bi-info-circle-fill'
-  };
-  
-  const bgMap = {
-    success: 'bg-success',
-    error: 'bg-danger',
-    warning: 'bg-warning',
-    info: 'bg-info'
-  };
-  
-  const toast = document.createElement('div');
-  toast.id = toastId;
-  toast.className = 'toast align-items-center text-white border-0';
-  toast.classList.add(bgMap[type] || bgMap.info);
-  toast.setAttribute('role', 'alert');
-  toast.setAttribute('aria-live', 'assertive');
-  toast.setAttribute('aria-atomic', 'true');
-  
-  toast.innerHTML = `
-    <div class="d-flex">
-      <div class="toast-body">
-        <i class="bi ${iconMap[type] || iconMap.info} me-2"></i>
-        ${message}
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  `;
-  
-  toastContainer.appendChild(toast);
-  
-  const bsToast = new bootstrap.Toast(toast, { delay: duration });
-  bsToast.show();
-  
-  toast.addEventListener('hidden.bs.toast', () => {
-    toast.remove();
-  });
-}
-
-/**
- * Create toast container if it doesn't exist
- */
-function createToastContainer() {
-  const container = document.createElement('div');
-  container.id = 'toast-container';
-  container.className = 'toast-container position-fixed top-0 end-0 p-3';
-  container.style.zIndex = '9999';
-  document.body.appendChild(container);
-  return container;
-}
-
-/**
- * Show loading spinner
- */
-export function showLoading(message = 'Cargando...') {
-  const existing = document.getElementById('loading-overlay');
-  if (existing) return;
-  
-  const overlay = document.createElement('div');
-  overlay.id = 'loading-overlay';
-  overlay.className = 'spinner-overlay';
-  overlay.innerHTML = `
-    <div class="text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">${message}</span>
-      </div>
-      <div class="mt-3 text-white">${message}</div>
-    </div>
-  `;
-  
-  document.body.appendChild(overlay);
-}
-
-/**
- * Hide loading spinner
- */
-export function hideLoading() {
-  const overlay = document.getElementById('loading-overlay');
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-/**
- * Confirm dialog
- */
-export function confirm(message, title = 'Confirmar') {
-  return new Promise((resolve) => {
-    const modalId = `confirm-modal-${Date.now()}`;
-    
-    const modal = document.createElement('div');
-    modal.id = modalId;
-    modal.className = 'modal fade';
-    modal.setAttribute('tabindex', '-1');
-    modal.innerHTML = `
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">${title}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>${message}</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary" id="${modalId}-confirm">Confirmar</button>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-    
-    document.getElementById(`${modalId}-confirm`).addEventListener('click', () => {
-      bsModal.hide();
-      resolve(true);
-    });
-    
-    modal.addEventListener('hidden.bs.modal', () => {
-      if (!modal.dataset.confirmed) {
-        resolve(false);
-      }
-      modal.remove();
-    });
-    
-    document.getElementById(`${modalId}-confirm`).addEventListener('click', () => {
-      modal.dataset.confirmed = 'true';
-    });
-  });
-}
-
-/**
- * Validate email
- */
-export function validateEmail(email) {
+export const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
-}
+};
 
-/**
- * Validate RUC (Uruguay)
- */
-export function validateRUC(ruc) {
-  // Basic validation: 12 digits
-  const re = /^\d{12}$/;
-  return re.test(ruc);
-}
+export const validateRUC = (ruc) => {
+  if (!ruc) return false;
+  if (ruc === '1') return true; // Default value
+  return /^\d{1,13}$/.test(ruc);
+};
 
-/**
- * Validate phone
- */
-export function validatePhone(phone) {
-  // Basic validation: at least 8 digits
-  const re = /^\+?[\d\s-]{8,}$/;
-  return re.test(phone);
-}
+export const validatePhone = (phone) => {
+  if (!phone) return false;
+  return /^[\d\s\-\+\(\)]{7,20}$/.test(phone);
+};
 
-/**
- * Sanitize HTML
- */
-export function sanitizeHTML(str) {
-  const temp = document.createElement('div');
-  temp.textContent = str;
-  return temp.innerHTML;
-}
-
-/**
- * Parse CSV
- */
-export function parseCSV(text) {
-  const lines = text.split('\n').filter(line => line.trim());
-  if (lines.length === 0) return { headers: [], rows: [] };
-  
-  const headers = lines[0].split(',').map(h => h.trim());
-  const rows = lines.slice(1).map(line => {
-    const values = line.split(',').map(v => v.trim());
-    const row = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index] || '';
-    });
-    return row;
-  });
-  
-  return { headers, rows };
-}
-
-/**
- * Export to CSV
- */
-export function exportToCSV(data, filename = 'export.csv') {
+export const exportToCSV = (data, filename) => {
   if (!data || data.length === 0) {
     showToast('No hay datos para exportar', 'warning');
     return;
   }
-  
+
   const headers = Object.keys(data[0]);
-  const csvContent = [
+  const csv = [
     headers.join(','),
     ...data.map(row => headers.map(header => {
-      const value = row[header] ?? '';
-      // Escape commas and quotes
-      return typeof value === 'string' && (value.includes(',') || value.includes('"'))
-        ? `"${value.replace(/"/g, '""')}"`
-        : value;
+      const value = row[header];
+      return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
     }).join(','))
   ].join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', filename);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  showToast('Archivo exportado exitosamente', 'success');
-}
 
-/**
- * Calculate margin
- */
-export function calculateMargin(priceNet, cogs, shippingCost = 0) {
-  const totalCost = parseFloat(cogs) + parseFloat(shippingCost);
-  const price = parseFloat(priceNet);
-  
-  if (price === 0) return 0;
-  
-  return ((price - totalCost) / price) * 100;
-}
-
-/**
- * Calculate price with tax
- */
-export function calculatePriceWithTax(priceNet, taxRate) {
-  return parseFloat(priceNet) * (1 + parseFloat(taxRate));
-}
-
-/**
- * Get query params
- */
-export function getQueryParams() {
-  const params = new URLSearchParams(window.location.search);
-  const result = {};
-  for (const [key, value] of params) {
-    result[key] = value;
-  }
-  return result;
-}
-
-/**
- * Set query params
- */
-export function setQueryParams(params) {
-  const url = new URL(window.location);
-  Object.keys(params).forEach(key => {
-    if (params[key] !== null && params[key] !== undefined) {
-      url.searchParams.set(key, params[key]);
-    } else {
-      url.searchParams.delete(key);
-    }
-  });
-  window.history.pushState({}, '', url);
-}
-
-/**
- * Copy to clipboard
- */
-export async function copyToClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast('Copiado al portapapeles', 'success');
-    return true;
-  } catch (err) {
-    console.error('Error copying to clipboard:', err);
-    showToast('Error al copiar', 'error');
-    return false;
-  }
-}
-
-/**
- * Download file
- */
-export function downloadFile(url, filename) {
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-/**
- * Generate UUID
- */
-export function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-/**
- * Truncate text
- */
-export function truncate(text, length = 50) {
-  if (!text) return '';
-  if (text.length <= length) return text;
-  return text.substring(0, length) + '...';
-}
-
-/**
- * Sleep/delay
- */
-export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * Group array by key
- */
-export function groupBy(array, key) {
-  return array.reduce((result, item) => {
-    const group = item[key];
-    if (!result[group]) {
-      result[group] = [];
-    }
-    result[group].push(item);
-    return result;
-  }, {});
-}
-
-/**
- * Sort array by key
- */
-export function sortBy(array, key, order = 'asc') {
-  return [...array].sort((a, b) => {
-    const aVal = a[key];
-    const bVal = b[key];
-    
-    if (aVal < bVal) return order === 'asc' ? -1 : 1;
-    if (aVal > bVal) return order === 'asc' ? 1 : -1;
-    return 0;
-  });
-}
-
-/**
- * Get file extension
- */
-export function getFileExtension(filename) {
-  return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
-}
-
-/**
- * Format file size
- */
-export function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-}
-
-/**
- * Check if object is empty
- */
-export function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
-}
-
-/**
- * Deep clone object
- */
-export function deepClone(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-/**
- * Merge objects
- */
-export function merge(...objects) {
-  return Object.assign({}, ...objects);
-}
-
-/**
- * Get nested property
- */
-export function getNestedProperty(obj, path) {
-  return path.split('.').reduce((current, prop) => current?.[prop], obj);
-}
-
-/**
- * Set nested property
- */
-export function setNestedProperty(obj, path, value) {
-  const keys = path.split('.');
-  const lastKey = keys.pop();
-  const target = keys.reduce((current, key) => {
-    if (!current[key]) current[key] = {};
-    return current[key];
-  }, obj);
-  target[lastKey] = value;
-}
-
-/**
- * Retry async function
- */
-export async function retry(fn, retries = 3, delay = 1000) {
-  try {
-    return await fn();
-  } catch (error) {
-    if (retries === 0) throw error;
-    await sleep(delay);
-    return retry(fn, retries - 1, delay * 2);
-  }
-}
-
-/**
- * Throttle function
- */
-export function throttle(func, limit) {
-  let inThrottle;
-  return function(...args) {
-    if (!inThrottle) {
-      func.apply(this, args);
-      inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
-    }
-  };
-}
-
-export default {
-  debounce,
-  formatCurrency,
-  formatNumber,
-  formatPercentage,
-  formatDate,
-  formatRelativeTime,
-  showToast,
-  showLoading,
-  hideLoading,
-  confirm,
-  validateEmail,
-  validateRUC,
-  validatePhone,
-  sanitizeHTML,
-  parseCSV,
-  exportToCSV,
-  calculateMargin,
-  calculatePriceWithTax,
-  getQueryParams,
-  setQueryParams,
-  copyToClipboard,
-  downloadFile,
-  generateUUID,
-  truncate,
-  sleep,
-  groupBy,
-  sortBy,
-  getFileExtension,
-  formatFileSize,
-  isEmpty,
-  deepClone,
-  merge,
-  getNestedProperty,
-  setNestedProperty,
-  retry,
-  throttle
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
 };

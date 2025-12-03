@@ -80,12 +80,24 @@
                 <span class="nav-link-text">Comparar Proveedores</span>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="scouting.html" class="nav-link">
+                <i class="bi bi-search"></i>
+                <span class="nav-link-text">Scouting</span>
+              </a>
+            </li>
           </ul>
         </div>
         
         <div class="nav-section">
           <h6 class="nav-section-title">Datos</h6>
           <ul>
+            <li class="nav-item">
+              <a href="sales.html" class="nav-link">
+                <i class="bi bi-cash-coin"></i>
+                <span class="nav-link-text">Ventas</span>
+              </a>
+            </li>
             <li class="nav-item">
               <a href="ingest.html" class="nav-link">
                 <i class="bi bi-cloud-upload"></i>
@@ -124,11 +136,8 @@
         
         <div class="topbar-right">
           <div class="topbar-actions">
-            <!-- Dummy Mode Badge -->
-            <div id="dummy-badge" class="dummy-badge" style="display: none;">
-              <i class="bi bi-database"></i>
-              <span>Modo Dummy</span>
-            </div>
+      
+            
             
             <!-- Dark Mode Toggle -->
             <button class="topbar-btn" id="dark-mode-toggle" title="Alternar tema">
@@ -162,8 +171,8 @@
               <p class="page-description">Gestión de proveedores y sus datos</p>
             </div>
             <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary" id="export-btn">
-                <i class="bi bi-download me-2"></i>Exportar CSV
+              <button class="btn btn-outline-primary" id="export-btn" disabled>
+                <i class="bi bi-download me-2"></i>Exportar Seleccionados (.xlsx)
               </button>
               <button class="btn btn-primary" id="new-provider-btn">
                 <i class="bi bi-plus-lg me-2"></i>Nuevo Proveedor
@@ -220,18 +229,22 @@
               <table class="table table-hover align-middle">
                 <thead>
                   <tr>
+                    <th style="width: 40px;">
+                      <input type="checkbox" class="form-check-input" id="select-all-checkbox" title="Seleccionar todos">
+                    </th>
                     <th>Nombre</th>
                     <th>RUC</th>
                     <th>Contacto</th>
                     <th>Comisión</th>
                     <th>Zonas</th>
+                    <th>Dropshipping</th>
                     <th>Estado</th>
                     <th class="text-end">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="providers-table-body">
                   <tr>
-                    <td colspan="7" class="text-center py-5">
+                    <td colspan="9" class="text-center py-5">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Cargando...</span>
                       </div>
@@ -273,8 +286,9 @@
                 <input type="text" class="form-control" id="provider-name" required>
               </div>
               <div class="col-12 col-md-6">
-                <label for="provider-ruc" class="form-label">RUC *</label>
-                <input type="text" class="form-control" id="provider-ruc" required maxlength="12">
+                <label for="provider-ruc" class="form-label">RUC</label>
+                <input type="text" class="form-control" id="provider-ruc" maxlength="13" placeholder="Ej: 1104487564001" value="1">
+                <small class="text-muted">Hasta 13 dígitos. Si no tiene RUC, dejar el valor por defecto "1"</small>
               </div>
               <div class="col-12 col-md-6">
                 <label for="provider-email" class="form-label">Email *</label>
@@ -283,6 +297,10 @@
               <div class="col-12 col-md-6">
                 <label for="provider-phone" class="form-label">Teléfono *</label>
                 <input type="tel" class="form-control" id="provider-phone" required>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="provider-contact-person" class="form-label">Persona de Contacto</label>
+                <input type="text" class="form-control" id="provider-contact-person" placeholder="Ej: Juan Pérez">
               </div>
               <div class="col-12 col-md-6">
                 <label for="provider-city" class="form-label">Ciudad</label>
@@ -308,8 +326,24 @@
                 </select>
               </div>
               <div class="col-12 col-md-6">
+                <label for="provider-whatsapp" class="form-label">WhatsApp</label>
+                <input type="tel" class="form-control" id="provider-whatsapp" placeholder="Ej: 593987654321">
+                <small class="text-muted">Número con código de país sin + ni espacios</small>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="provider-website" class="form-label">Sitio Web / Redes Sociales</label>
+                <input type="url" class="form-control" id="provider-website" placeholder="https://ejemplo.com">
+              </div>
+              <div class="col-12 col-md-6">
                 <label for="provider-zones" class="form-label">Zonas de Cobertura</label>
                 <input type="text" class="form-control" id="provider-zones" placeholder="Ej: Montevideo, Canelones">
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="provider-dropshipping" class="form-label">¿Trabaja con Dropshipping?</label>
+                <select class="form-select" id="provider-dropshipping">
+                  <option value="false">No</option>
+                  <option value="true">Sí</option>
+                </select>
               </div>
               <div class="col-12">
                 <label for="provider-shipping" class="form-label">Política de Envío</label>

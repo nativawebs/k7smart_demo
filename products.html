@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="assets/css/custom.css">
 </head>
+
 <body>
   <div class="app-container">
     <aside class="sidebar" id="sidebar">
@@ -22,39 +24,51 @@
         <div class="nav-section">
           <h6 class="nav-section-title">Principal</h6>
           <ul>
-            <li class="nav-item"><a href="index.html" class="nav-link"><i class="bi bi-speedometer2"></i><span class="nav-link-text">Dashboard</span></a></li>
+            <li class="nav-item"><a href="index.html" class="nav-link"><i class="bi bi-speedometer2"></i><span
+                  class="nav-link-text">Dashboard</span></a></li>
           </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Gestión</h6>
           <ul>
-            <li class="nav-item"><a href="providers.html" class="nav-link"><i class="bi bi-building"></i><span class="nav-link-text">Proveedores</span></a></li>
-            <li class="nav-item"><a href="products.html" class="nav-link active"><i class="bi bi-box-seam"></i><span class="nav-link-text">Productos</span></a></li>
-            <li class="nav-item"><a href="categories.html" class="nav-link"><i class="bi bi-tags"></i><span class="nav-link-text">Categorías</span></a></li>
+            <li class="nav-item"><a href="providers.html" class="nav-link"><i class="bi bi-building"></i><span
+                  class="nav-link-text">Proveedores</span></a></li>
+            <li class="nav-item"><a href="products.html" class="nav-link active"><i class="bi bi-box-seam"></i><span
+                  class="nav-link-text">Productos</span></a></li>
+            <li class="nav-item"><a href="categories.html" class="nav-link"><i class="bi bi-tags"></i><span
+                  class="nav-link-text">Categorías</span></a></li>
           </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Análisis</h6>
           <ul>
-            <li class="nav-item"><a href="compare.html" class="nav-link"><i class="bi bi-graph-up-arrow"></i><span class="nav-link-text">Comparativas</span></a></li>
-            <li class="nav-item"><a href="providers-compare.html" class="nav-link"><i class="bi bi-arrow-left-right"></i><span class="nav-link-text">Comparar Proveedores</span></a></li>
+            <li class="nav-item"><a href="compare.html" class="nav-link"><i class="bi bi-graph-up-arrow"></i><span
+                  class="nav-link-text">Comparativas</span></a></li>
+            <li class="nav-item"><a href="providers-compare.html" class="nav-link"><i
+                  class="bi bi-arrow-left-right"></i><span class="nav-link-text">Comparar Proveedores</span></a></li>
+            <li class="nav-item"><a href="scouting.html" class="nav-link"><i class="bi bi-search"></i><span
+                  class="nav-link-text">Scouting</span></a></li>
           </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Datos</h6>
           <ul>
-            <li class="nav-item"><a href="ingest.html" class="nav-link"><i class="bi bi-cloud-upload"></i><span class="nav-link-text">Ingesta</span></a></li>
+            <li class="nav-item"><a href="sales.html" class="nav-link"><i class="bi bi-cash-coin"></i><span
+                  class="nav-link-text">Ventas</span></a></li>
+            <li class="nav-item"><a href="ingest.html" class="nav-link"><i class="bi bi-cloud-upload"></i><span
+                  class="nav-link-text">Ingesta</span></a></li>
           </ul>
         </div>
         <div class="nav-section">
           <h6 class="nav-section-title">Sistema</h6>
           <ul>
-            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="bi bi-gear"></i><span class="nav-link-text">Configuración</span></a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="bi bi-gear"></i><span
+                  class="nav-link-text">Configuración</span></a></li>
           </ul>
         </div>
       </nav>
     </aside>
-    
+
     <main class="main-content">
       <header class="topbar">
         <div class="topbar-left">
@@ -67,20 +81,26 @@
         </div>
         <div class="topbar-right">
           <div class="topbar-actions">
-            <div id="dummy-badge" class="dummy-badge" style="display: none;"><i class="bi bi-database"></i><span>Modo Dummy</span></div>
+            
             <button class="topbar-btn" id="dark-mode-toggle"><i class="bi bi-moon-stars"></i></button>
             <div class="dropdown">
-              <button class="topbar-btn" type="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i></button>
+              <button class="topbar-btn" type="button" data-bs-toggle="dropdown"><i
+                  class="bi bi-person-circle"></i></button>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li><h6 class="dropdown-header" id="user-email">Admin</h6></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+                <li>
+                  <h6 class="dropdown-header" id="user-email">Admin</h6>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="#" id="logout-btn"><i class="bi bi-box-arrow-right me-2"></i>Cerrar
+                    Sesión</a></li>
               </ul>
             </div>
           </div>
         </div>
       </header>
-      
+
       <div class="content-area">
         <div class="page-header">
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -89,12 +109,14 @@
               <p class="page-description">Gestión de productos, precios e histórico</p>
             </div>
             <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary" id="export-btn"><i class="bi bi-download me-2"></i>Exportar CSV</button>
-              <button class="btn btn-primary" id="new-product-btn"><i class="bi bi-plus-lg me-2"></i>Nuevo Producto</button>
+              <button class="btn btn-outline-primary" id="export-btn"><i class="bi bi-download me-2"></i>Exportar
+                CSV</button>
+              <button class="btn btn-primary" id="new-product-btn"><i class="bi bi-plus-lg me-2"></i>Nuevo
+                Producto</button>
             </div>
           </div>
         </div>
-        
+
         <div class="card mb-4">
           <div class="card-body">
             <div class="row g-3">
@@ -119,12 +141,13 @@
                 </select>
               </div>
               <div class="col-12 col-md-2">
-                <button class="btn btn-outline-secondary w-100" id="clear-filters-btn"><i class="bi bi-x-circle me-2"></i>Limpiar</button>
+                <button class="btn btn-outline-secondary w-100" id="clear-filters-btn"><i
+                    class="bi bi-x-circle me-2"></i>Limpiar</button>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="card">
           <div class="card-body">
             <div class="table-responsive">
@@ -135,21 +158,29 @@
                     <th>Producto</th>
                     <th>Categoría</th>
                     <th>Proveedor</th>
-                    <th>COGS</th>
-                    <th>Precio Neto</th>
-                    <th>Precio Bruto</th>
+                    <th>Costo Proveedor</th>
+                    <th>PVP</th>
+                    <th>Ref</th>
                     <th>Margen</th>
                     <th class="text-end">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="products-table-body">
-                  <tr><td colspan="9" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>
+                  <tr>
+                    <td colspan="10" class="text-center py-5">
+                      <div class="spinner-border text-primary"></div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
             <div class="d-flex justify-content-between align-items-center mt-4">
-              <div class="text-muted">Mostrando <span id="showing-from">0</span> a <span id="showing-to">0</span> de <span id="total-records">0</span> registros</div>
-              <nav><ul class="pagination mb-0" id="pagination"></ul></nav>
+              <div class="text-muted">Mostrando <span id="showing-from">0</span> a <span id="showing-to">0</span> de
+                <span id="total-records">0</span> registros
+              </div>
+              <nav>
+                <ul class="pagination mb-0" id="pagination"></ul>
+              </nav>
             </div>
           </div>
         </div>
@@ -184,17 +215,43 @@
                 <select class="form-select" id="product-provider" required></select>
               </div>
               <div class="col-12 col-md-4">
-                <label for="product-cogs" class="form-label">COGS *</label>
-                <input type="number" class="form-control" id="product-cogs" step="0.01" required>
+                <label for="product-costo-proveedor" class="form-label">Costo Proveedor *</label>
+                <input type="number" class="form-control" id="product-costo-proveedor" step="0.01" required>
               </div>
               <div class="col-12 col-md-4">
-                <label for="product-price-net" class="form-label">Precio Neto *</label>
-                <input type="number" class="form-control" id="product-price-net" step="0.01" required>
+                <label for="product-pvp" class="form-label">PVP (con IVA) *</label>
+                <input type="number" class="form-control" id="product-pvp" step="0.01" required>
               </div>
               <div class="col-12 col-md-4">
                 <label for="product-tax-rate" class="form-label">IVA (%)</label>
                 <input type="number" class="form-control" id="product-tax-rate" value="15" step="0.01">
               </div>
+
+              <div class="col-12">
+                <h6 class="border-bottom pb-2 mb-3 mt-2">Datos de Referencia</h6>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label for="product-ref-link" class="form-label">Link de Referencia</label>
+                <input type="url" class="form-control" id="product-ref-link" placeholder="https://...">
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="product-ref-platform" class="form-label">Plataforma</label>
+                <input type="text" class="form-control" id="product-ref-platform" placeholder="Ej: MercadoLibre">
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="product-ref-status" class="form-label">Status Referencia</label>
+                <select class="form-select" id="product-ref-status">
+                  <option value="Normal">Normal</option>
+                  <option value="Más vendido">Más vendido</option>
+                  <option value="Mejor precio">Mejor precio</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="product-ref-price" class="form-label">Precio Referencia (PVP)</label>
+                <input type="number" class="form-control" id="product-ref-price" step="0.01">
+              </div>
+
               <div class="col-12">
                 <label for="product-notes" class="form-label">Notas</label>
                 <textarea class="form-control" id="product-notes" rows="2"></textarea>
@@ -214,4 +271,5 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="js/views/products.js"></script>
 </body>
+
 </html>

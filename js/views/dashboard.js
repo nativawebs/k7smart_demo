@@ -13,6 +13,7 @@ import { signOut, getCurrentUser, initSupabase } from '../modules/auth.js';
 let salesMarginChart = null;
 let topCategoriesChart = null;
 let topProvidersChart = null;
+let topReferenceCategoriesChart = null;
 
 /**
  * Initialize dashboard
@@ -28,22 +29,19 @@ async function init() {
     } catch (e) {
       console.log('Config file not found, using defaults');
     }
-    
+
     // Get current user
     const user = await getCurrentUser();
     if (user) {
       document.getElementById('user-email').textContent = user.email;
     }
-    
+
     // Setup event listeners
     setupEventListeners();
-    
-    // Update UI based on state
-    updateDummyUI();
-    
+
     // Load dashboard data
     await loadDashboard();
-    
+
     // Setup keyboard shortcuts
     setupKeyboardShortcuts();
   } catch (error) {
@@ -58,12 +56,12 @@ function setupEventListeners() {
   // Sidebar toggle
   const sidebarToggle = document.getElementById('sidebar-toggle');
   const sidebar = document.getElementById('sidebar');
-  
+
   sidebarToggle?.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
     state.toggleSidebar();
   });
-  
+
   // Dark mode toggle
   const darkModeToggle = document.getElementById('dark-mode-toggle');
   darkModeToggle?.addEventListener('click', () => {
@@ -71,29 +69,25 @@ function setupEventListeners() {
     updateDarkModeIcon(isDark);
     updateChartsTheme();
   });
-  
+
   // Update dark mode icon on load
   updateDarkModeIcon(state.getState().darkMode);
-  
+
   // Dummy mode toggle
   const toggleDummyBtn = document.getElementById('toggle-dummy-btn');
   toggleDummyBtn?.addEventListener('click', async () => {
     const isDummy = state.toggleDummyMode();
-    updateDummyUI();
+    updateDummyModeUI(isDummy);
     await loadDashboard();
   });
-  
+
   // Logout
   const logoutBtn = document.getElementById('logout-btn');
   logoutBtn?.addEventListener('click', async (e) => {
     e.preventDefault();
     await signOut();
   });
-  
-  // Subscribe to dummy mode changes
-  state.subscribe('dummyMode', (newValue) => {
-    updateDummyUI();
-  });
+
 }
 
 /**
@@ -109,20 +103,14 @@ function updateDarkModeIcon(isDark) {
 /**
  * Update dummy mode UI
  */
-function updateDummyUI() {
-  const isDummy = state.getState().dummyMode;
-  const badge = document.getElementById('dummy-badge');
-  const btnText = document.getElementById('dummy-btn-text');
+function updateDummyModeUI(isDummy) {
   const toggleBtn = document.getElementById('toggle-dummy-btn');
-  
-  if (badge) {
-    badge.style.display = isDummy ? 'flex' : 'none';
-  }
-  
+  const btnText = toggleBtn?.querySelector('span');
+
   if (btnText) {
     btnText.textContent = isDummy ? 'Usar Datos Reales' : 'Usar Datos Dummy';
   }
-  
+
   if (toggleBtn) {
     toggleBtn.className = isDummy ? 'btn btn-success' : 'btn btn-outline-primary';
   }
@@ -133,14 +121,18 @@ function updateDummyUI() {
  */
 async function loadDashboard() {
   showLoading('Cargando dashboard...');
-  
+
   try {
     // Load KPIs
     await loadKPIs();
-    
+
     // Load charts
     await loadCharts();
-    
+
+    // Load new sections
+    await loadTopReferenceProducts();
+    await loadTopSellingProducts();
+
     hideLoading();
   } catch (error) {
     console.error('Error loading dashboard:', error);
@@ -154,22 +146,22 @@ async function loadDashboard() {
 async function loadKPIs() {
   try {
     const result = await api.getKPIs();
-    
+
     if (result.success && result.data) {
       const kpis = result.data;
-      
+
       // Sales
       updateKPI('sales', kpis.sales.value, kpis.sales.change, 'currency');
-      
+
       // AOV
       updateKPI('aov', kpis.aov.value, kpis.aov.change, 'currency');
-      
+
       // Margin
       updateKPI('margin', kpis.margin.value, kpis.margin.change, 'percentage');
-      
+
       // ROAS
       updateKPI('roas', kpis.roas.value, kpis.roas.change, 'multiplier');
-      
+
       // Conversion
       updateKPI('conversion', kpis.conversion.value, kpis.conversion.change, 'percentage');
     }
@@ -184,7 +176,7 @@ async function loadKPIs() {
 function updateKPI(name, value, change, format) {
   const valueEl = document.getElementById(`kpi-${name}`);
   const changeEl = document.getElementById(`kpi-${name}-change`);
-  
+
   if (valueEl) {
     if (format === 'currency') {
       valueEl.textContent = formatCurrency(value);
@@ -196,7 +188,7 @@ function updateKPI(name, value, change, format) {
       valueEl.textContent = formatNumber(value);
     }
   }
-  
+
   if (changeEl) {
     const isPositive = change >= 0;
     changeEl.className = `kpi-change ${isPositive ? 'positive' : 'negative'}`;
@@ -217,17 +209,23 @@ async function loadCharts() {
     if (salesResult.success && salesResult.data) {
       updateSalesMarginChart(salesResult.data);
     }
-    
+
     // Top Categories
     const categoriesResult = await api.getTopCategories(5);
     if (categoriesResult.success && categoriesResult.data) {
       updateTopCategoriesChart(categoriesResult.data);
     }
-    
+
     // Top Providers
     const providersResult = await api.getTopProviders(5);
     if (providersResult.success && providersResult.data) {
       updateTopProvidersChart(providersResult.data);
+    }
+
+    // Top Reference Categories
+    const refCategoriesResult = await api.getTopReferenceCategories(5);
+    if (refCategoriesResult.success && refCategoriesResult.data) {
+      updateTopReferenceCategoriesChart(refCategoriesResult.data);
     }
   } catch (error) {
     console.error('Error loading charts:', error);
@@ -239,7 +237,7 @@ async function loadCharts() {
  */
 function updateSalesMarginChart(data) {
   const chartData = charts.prepareSalesMarginData(data);
-  
+
   if (salesMarginChart) {
     charts.updateChart(salesMarginChart, chartData);
   } else {
@@ -247,7 +245,7 @@ function updateSalesMarginChart(data) {
       plugins: {
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               let label = context.dataset.label || '';
               if (label) {
                 label += ': ';
@@ -267,7 +265,7 @@ function updateSalesMarginChart(data) {
  */
 function updateTopCategoriesChart(data) {
   const chartData = charts.prepareTopCategoriesData(data);
-  
+
   if (topCategoriesChart) {
     charts.updateChart(topCategoriesChart, chartData);
   } else {
@@ -275,7 +273,7 @@ function updateTopCategoriesChart(data) {
       plugins: {
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               let label = context.dataset.label || '';
               if (label) {
                 label += ': ';
@@ -295,7 +293,7 @@ function updateTopCategoriesChart(data) {
  */
 function updateTopProvidersChart(data) {
   const chartData = charts.prepareTopProvidersData(data);
-  
+
   if (topProvidersChart) {
     charts.updateChart(topProvidersChart, chartData);
   } else {
@@ -307,7 +305,7 @@ function updateTopProvidersChart(data) {
         },
         tooltip: {
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               return 'Margen: ' + formatCurrency(context.parsed.x);
             }
           }
@@ -316,13 +314,113 @@ function updateTopProvidersChart(data) {
       scales: {
         x: {
           ticks: {
-            callback: function(value) {
-              return formatCurrency(value, 0);
+            callback: function (value) {
+              return formatCurrency(value);
             }
           }
         }
       }
     });
+  }
+}
+
+/**
+ * Update top reference categories chart
+ */
+function updateTopReferenceCategoriesChart(data) {
+  // Prepare data for chart
+  const labels = data.map(d => d.category);
+  const values = data.map(d => d.margin); // Using margin %
+
+  const chartData = {
+    labels: labels,
+    datasets: [{
+      label: 'Margen Referencial %',
+      data: values,
+      backgroundColor: 'rgba(255, 107, 53, 0.7)',
+      borderColor: 'rgba(255, 107, 53, 1)',
+      borderWidth: 1
+    }]
+  };
+
+  if (topReferenceCategoriesChart) {
+    charts.updateChart(topReferenceCategoriesChart, chartData);
+  } else {
+    topReferenceCategoriesChart = charts.createBarChart('top-reference-categories-chart', chartData, {
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return 'Margen: ' + formatPercentage(context.parsed.x, 1);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            callback: function (value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/**
+ * Load Top Reference Products
+ */
+async function loadTopReferenceProducts() {
+  const tbody = document.getElementById('top-reference-products-body');
+  if (!tbody) return;
+
+  const result = await api.getTopReferenceProducts(10);
+
+  if (result.success && result.data && result.data.length > 0) {
+    tbody.innerHTML = result.data.map(p => `
+      <tr>
+        <td>
+          <div class="fw-semibold">${p.name}</div>
+          <small class="text-muted">${p.sku}</small>
+        </td>
+        <td>
+          ${p.link_referencia ? `<a href="${p.link_referencia}" target="_blank" class="text-decoration-none"><i class="bi bi-box-arrow-up-right me-1"></i>${p.plataforma_referencia || 'Link'}</a>` : (p.plataforma_referencia || '-')}
+        </td>
+        <td><span class="badge bg-info text-dark">${p.status_referencia || 'Normal'}</span></td>
+        <td class="text-end fw-bold">${formatCurrency(p.precio_referencia_pvp || 0)}</td>
+      </tr>
+    `).join('');
+  } else {
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-3 text-muted">No hay datos de referencia</td></tr>';
+  }
+}
+
+/**
+ * Load Top Selling Products
+ */
+async function loadTopSellingProducts() {
+  const tbody = document.getElementById('top-kiosko-products-body');
+  if (!tbody) return;
+
+  const result = await api.getTopSellingProducts(10);
+
+  if (result.success && result.data && result.data.length > 0) {
+    tbody.innerHTML = result.data.map(p => `
+      <tr>
+        <td>
+          <div class="fw-semibold">${p.product_name}</div>
+          <small class="text-muted">${p.product_sku}</small>
+        </td>
+        <td>${p.total_units_sold} unid.</td>
+        <td class="text-end fw-bold">${formatCurrency(p.total_sales || 0)}</td>
+      </tr>
+    `).join('');
+  } else {
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-3 text-muted">No hay ventas registradas</td></tr>';
   }
 }
 
@@ -339,6 +437,9 @@ function updateChartsTheme() {
   if (topProvidersChart) {
     charts.updateChartTheme(topProvidersChart);
   }
+  if (topReferenceCategoriesChart) {
+    charts.updateChartTheme(topReferenceCategoriesChart);
+  }
 }
 
 /**
@@ -346,35 +447,35 @@ function updateChartsTheme() {
  */
 function setupKeyboardShortcuts() {
   let keys = {};
-  
+
   document.addEventListener('keydown', (e) => {
     keys[e.key] = true;
-    
+
     // g + d = Dashboard
     if (keys['g'] && keys['d']) {
       window.location.href = 'index.html';
       keys = {};
     }
-    
+
     // g + p = Providers
     if (keys['g'] && keys['p']) {
       window.location.href = 'providers.html';
       keys = {};
     }
-    
+
     // g + r = Products
     if (keys['g'] && keys['r']) {
       window.location.href = 'products.html';
       keys = {};
     }
-    
+
     // g + c = Compare
     if (keys['g'] && keys['c']) {
       window.location.href = 'compare.html';
       keys = {};
     }
   });
-  
+
   document.addEventListener('keyup', (e) => {
     delete keys[e.key];
   });
